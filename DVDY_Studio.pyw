@@ -80,6 +80,10 @@ def main():
         return
     sys.excepthook = _excepthook
 
+    # Python 3.15: resolver los «lazy imports» antes de crear hilos de descarga
+    from dvdy.compat import resolve_lazy_imports
+    resolve_lazy_imports()
+
     # Si se descargó un yt-dlp más nuevo desde la app, usarlo (antes de importar yt_dlp)
     from dvdy.deps import activate_ytdlp_override
     activate_ytdlp_override()
@@ -134,14 +138,36 @@ def _selftest(out_dir):
                 deps.install(key, status=lambda s: log("  ", s))
             log("tras instalar, faltan:", deps.missing_components(), "ffmpeg:", find_ffmpeg(), "js:", find_js_runtime())
         url ="https://www.youtube.com/watch?v=jNQXAC9IVRw"
-        for audio in (True, False):
-            c = default_choices(audio)
+        import concurrent.futures as cf
+        log("ThreadPoolExecutor en el módulo:", type(cf.__dict__.get("ThreadPoolExecutor")).__name__)
+        # audio, video y video por fragmentos HLS (usa ThreadPoolExecutor en paralelo)
+        for kind, fmt in (("audio", None), ("video", None), ("hls", "bv*[protocol^=m3u8]+ba/b")):
+            c = default_choices(kind == "audio")
             c["output_dir"] = out_dir
             c["quality"] = "360"
-            t = DownloadTask(url, build_opts(c))
-            t.run()
-            log("descarga", "audio" if audio else "video", "->", t.output, "avisos:", t.warnings)
-        src = t.output
+            c["template"] = f"%(title)s [{kind}].%(ext)s"
+            opts = build_opts(c)
+            if fmt:
+                opts["format"] = fmt
+            t = DownloadTask(url, opts)
+            # En un hilo aparte, igual que en la app
+            import threading
+            err = []
+
+            def _run(task=t):
+                try:
+                    task.run()
+                except Exception:
+                    err.append(traceback.format_exc())
+
+            th = threading.Thread(target=_run)
+            th.start()
+            th.join()
+            if err:
+                raise RuntimeError(err[0])
+            log("descarga", kind, "->", t.output, "avisos:", t.warnings)
+            if kind == "video":
+                src = t.output
         dst = os.path.join(out_dir, "convertido.mp3")
         f = FFmpegTask("conv", [["-i", src, "-vn", "-b:a", "192k", dst]], output=dst, probe=src)
         f.run()

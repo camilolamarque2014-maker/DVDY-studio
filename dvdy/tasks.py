@@ -172,6 +172,9 @@ class TaskManager(QObject):
         self._emit_counts()
 
     def _start(self, task):
+        # Se ejecuta en el hilo principal: resolver lazy imports pendientes antes del hilo de trabajo
+        from .compat import resolve_lazy_imports
+        resolve_lazy_imports()
         task.reset_for_run()
         task.status = RUNNING
         task.progress = -1
