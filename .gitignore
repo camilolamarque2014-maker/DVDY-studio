@@ -1,0 +1,4 @@
+﻿__pycache__/
+*.pyc
+compilacion/
+assets/icon.png
