@@ -133,6 +133,16 @@ def _selftest(out_dir):
         dlg.show()
         dlg.grab().save(os.path.join(out_dir, "setup_dialog.png"))
         dlg.close()
+        # HTTPS solo con los certificados de certifi (simula un Windows sin certificados raíz)
+        import ssl
+        import certifi
+        import urllib.request
+        only = ssl.SSLContext(ssl.PROTOCOL_TLS_CLIENT)
+        only.load_verify_locations(cafile=certifi.where())
+        with urllib.request.urlopen(deps.URLS["yt-dlp"], timeout=60, context=only) as r:
+            r.read(1024)
+        log("https solo con certifi: OK", os.path.isfile(certifi.where()))
+        deps._ssl_ctx = only  # el instalador también usará solo certifi, como en Windows Sandbox
         if "--install" in sys.argv:
             for key in deps.missing_components():
                 deps.install(key, status=lambda s: log("  ", s))

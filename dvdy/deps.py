@@ -78,10 +78,38 @@ def missing_components():
 # ---------------------------------------------------------------------------
 #  Descarga con progreso
 # ---------------------------------------------------------------------------
+_ssl_ctx = None
+
+
+def ssl_context():
+    """Contexto HTTPS con los certificados de Windows MÁS los de certifi.
+
+    Un Windows recién instalado (o Windows Sandbox) trae muy pocos certificados raíz:
+    Windows los descarga solo cuando un programa propio los pide, pero Python no usa ese
+    mecanismo y fallaría con CERTIFICATE_VERIFY_FAILED. Con certifi (incluido en la app)
+    la verificación funciona igual, sin desactivar la seguridad.
+    """
+    global _ssl_ctx
+    if _ssl_ctx is None:
+        import ssl
+        ctx = ssl.create_default_context()  # certificados del sistema
+        try:
+            import certifi
+            ctx.load_verify_locations(cafile=certifi.where())
+        except Exception:
+            pass
+        _ssl_ctx = ctx
+    return _ssl_ctx
+
+
+def urlopen(url, timeout=60, user_agent="DVDY-Studio"):
+    req = urllib.request.Request(url, headers={"User-Agent": user_agent})
+    return urllib.request.urlopen(req, timeout=timeout, context=ssl_context())
+
+
 def download(url, dest, progress=None, cancel=None):
     """Descarga url -> dest. progress(hechos, total). cancel: threading.Event."""
-    req = urllib.request.Request(url, headers={"User-Agent": "DVDY-Studio"})
-    with urllib.request.urlopen(req, timeout=60) as r:
+    with urlopen(url, timeout=60) as r:
         total = int(r.headers.get("Content-Length") or 0)
         done = 0
         with open(dest, "wb") as f:

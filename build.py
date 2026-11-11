@@ -59,7 +59,7 @@ def main():
         "--collect-all", "yt_dlp_ejs",
         "--collect-submodules", "mutagen",
         "--hidden-import", "websockets",
-        "--hidden-import", "certifi",
+        "--collect-data", "certifi",   # cacert.pem: certificados para HTTPS en Windows sin actualizar
         "--hidden-import", "brotli",
         "--hidden-import", "Cryptodome",
         # Módulos de Qt que no se usan (reduce bastante el tamaño)

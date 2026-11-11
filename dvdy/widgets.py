@@ -413,8 +413,8 @@ def load_thumbnail(url, target_label, size):
 
     def work():
         try:
-            req = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
-            with urllib.request.urlopen(req, timeout=15) as r:
+            from .deps import urlopen
+            with urlopen(url, timeout=15, user_agent="Mozilla/5.0") as r:
                 data = r.read()
             _cache[url] = data
             _relay.loaded.emit(target_label, url, data)

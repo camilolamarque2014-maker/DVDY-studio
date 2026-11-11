@@ -5,7 +5,7 @@ import threading
 import time
 
 APP_NAME = "DVDY Studio"
-APP_VERSION = "2.0"
+APP_VERSION = "2.0.1"
 
 CONFIG_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "DVDY Studio")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
