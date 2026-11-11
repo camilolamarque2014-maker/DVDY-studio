@@ -57,7 +57,7 @@ Todo lo que genera PyInstaller queda en la carpeta `compilacion/`. El programa e
 
 ## Testers
 
--
-[
+-[pablolamarque-droid](https://github.com/pablolamarque-droid)
+
 
 Usa esta herramienta solo con contenido que tengas derecho a descargar.
