@@ -55,4 +55,9 @@ Todo lo que genera PyInstaller queda en la carpeta `compilacion/`. El programa e
 - [Deno](https://deno.com) (MIT)
 - [Qt / PySide6](https://www.qt.io/qt-for-python) (LGPL)
 
+## Testers
+
+-
+[
+
 Usa esta herramienta solo con contenido que tengas derecho a descargar.
