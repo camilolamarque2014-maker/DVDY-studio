@@ -22,8 +22,9 @@ def card(title=None, subtitle=None, spacing=10):
     lay.setContentsMargins(16, 14, 16, 16)
     lay.setSpacing(spacing)
     if title:
-        t = QLabel(title)
-        t.setObjectName("SectionTitle")
+        t = QLabel(title.upper())
+        t.setObjectName("Label")
+        t.setAccessibleName(title)
         lay.addWidget(t)
     if subtitle:
         s = QLabel(subtitle)
@@ -86,7 +87,8 @@ def set_combo(c, data):
 def hline():
     f = QFrame()
     f.setFrameShape(QFrame.HLine)
-    f.setStyleSheet("color: rgba(128,128,128,40);")
+    f.setObjectName("Sep")
+    f.setFixedHeight(1)
     return f
 
 
@@ -187,7 +189,7 @@ class Segmented(QWidget):
             b.setCheckable(True)
             b.setCursor(Qt.PointingHandCursor)
             from PySide6.QtGui import QFont, QFontMetrics
-            bold = QFont("Segoe UI Variable Text")
+            bold = QFont("Archivo")
             bold.setPointSizeF(10.5)
             bold.setBold(True)
             b.setMinimumWidth(QFontMetrics(bold).horizontalAdvance(text) + 40)
@@ -346,6 +348,7 @@ class _DropList(QListWidget):
     def __init__(self, placeholder):
         super().__init__()
         self.placeholder = placeholder
+        self.setObjectName("DropZone")
         self.setAcceptDrops(True)
         self.setMinimumHeight(120)
 
@@ -540,11 +543,11 @@ class ToggleSwitch(QAbstractButton):
         self._anim.start()
 
     def paintEvent(self, e):
-        from .config import cfg
+        from .theme import current
         p = QPainter(self)
         p.setRenderHint(QPainter.Antialiasing)
-        accent = QColor(cfg["accent"])
-        off = QColor("#3a4052") if cfg["theme"] != "light" else QColor("#c9cdd8")
+        accent = QColor(current["text"])
+        off = QColor(current["line2"])
         track = QColor(
             int(off.red() + (accent.red() - off.red()) * self._pos),
             int(off.green() + (accent.green() - off.green()) * self._pos),
@@ -555,8 +558,13 @@ class ToggleSwitch(QAbstractButton):
         p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         d = self.height() - 6
         x = 3 + (self.width() - d - 6) * self._pos
-        p.setBrush(QColor("white"))
+        p.setBrush(QColor(current["bg"]) if self._pos > 0.5 else QColor(current["text"]))
         p.drawEllipse(QRectF(x, 3, d, d))
+        if self.hasFocus():
+            p.setBrush(Qt.NoBrush)
+            from PySide6.QtGui import QPen
+            p.setPen(QPen(QColor(current["amber"]), 1.5))
+            p.drawRoundedRect(r.adjusted(0.75, 0.75, -0.75, -0.75), r.height() / 2, r.height() / 2)
         p.end()
 
     def sizeHint(self):
@@ -575,6 +583,8 @@ class ModeSwitch(QWidget):
         self.simple_lbl = QLabel("Simple")
         self.adv_lbl = QLabel("Avanzado")
         self.switch = ToggleSwitch(advanced)
+        self.switch.setAccessibleName("Modo avanzado")
+        self.switch.setToolTip("Simple: lo esencial a la vista.  Avanzado: todas las secciones y herramientas.")
         for l, val in ((self.simple_lbl, False), (self.adv_lbl, True)):
             l.setCursor(Qt.PointingHandCursor)
             l.mousePressEvent = lambda _e, v=val: self.switch.setChecked(v)
@@ -598,3 +608,233 @@ class ModeSwitch(QWidget):
 
     def is_advanced(self):
         return self.switch.isChecked()
+
+# ---------------------------------------------------------------------------
+#  Piezas propias de la identidad «Radio de Madrugada»
+# ---------------------------------------------------------------------------
+from PySide6.QtCore import QPointF  # noqa: E402
+
+
+def plural(n, one, many):
+    return f"{n} {one if n == 1 else many}"
+
+
+class BandButton(QAbstractButton):
+    """Una banda del selector (como AM / FM): punto indicador y etiqueta en versalitas."""
+
+    def __init__(self, text, parent=None):
+        super().__init__(parent)
+        self.setText(text)
+        self.setCheckable(True)
+        self.setCursor(Qt.PointingHandCursor)
+        self.setFocusPolicy(Qt.StrongFocus)
+        self.setAccessibleName(text)
+
+    def sizeHint(self):
+        from PySide6.QtCore import QSize
+        from .theme import label_font
+        from PySide6.QtGui import QFontMetrics
+        fm = QFontMetrics(label_font(10.5, spacing=118))
+        return QSize(fm.horizontalAdvance(self.text().upper()) + 34, 34)
+
+    def paintEvent(self, e):
+        from PySide6.QtGui import QPen
+        from .theme import current, label_font
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        on = self.isChecked()
+        h = self.height()
+        cy = h / 2
+        ring = QColor(current["amber"] if on else current["muted"])
+        p.setPen(QPen(ring, 1.2))
+        p.setBrush(QColor(current["amber"]) if on else Qt.NoBrush)
+        p.drawEllipse(QRectF(2, cy - 5, 10, 10))
+        p.setPen(QColor(current["text"] if (on or self.underMouse()) else current["muted"]))
+        p.setFont(label_font(10.5, weight=700 if on else 600, spacing=118))
+        p.drawText(QRectF(22, 0, self.width() - 22, h), Qt.AlignVCenter | Qt.AlignLeft, self.text().upper())
+        if self.hasFocus():
+            p.setPen(QPen(QColor(current["text"]), 1))
+            p.setBrush(Qt.NoBrush)
+            p.drawRoundedRect(QRectF(0.5, 2.5, self.width() - 1, h - 5), 5, 5)
+        p.end()
+
+    def enterEvent(self, e):
+        self.update()
+        super().enterEvent(e)
+
+    def leaveEvent(self, e):
+        self.update()
+        super().leaveEvent(e)
+
+
+class BandSelector(QWidget):
+    """Selector de modo de descarga con estética de banda de radio."""
+    changed = Signal(str)
+
+    def __init__(self, items, current_key=None):
+        super().__init__()
+        lay = QHBoxLayout(self)
+        lay.setContentsMargins(0, 0, 0, 0)
+        lay.setSpacing(26)
+        self.group = QButtonGroup(self)
+        self.group.setExclusive(True)
+        self.buttons = {}
+        for text, key in items:
+            b = BandButton(text)
+            self.group.addButton(b)
+            self.buttons[key] = b
+            lay.addWidget(b)
+            b.toggled.connect(lambda on, k=key: on and self.changed.emit(k))
+        lay.addStretch(1)
+        self.set_value(current_key or items[0][1])
+
+    def value(self):
+        for k, b in self.buttons.items():
+            if b.isChecked():
+                return k
+        return None
+
+    def set_value(self, key):
+        if key in self.buttons:
+            self.buttons[key].setChecked(True)
+
+    def set_key_visible(self, key, visible):
+        self.buttons[key].setVisible(visible)
+
+
+class DialStrip(QWidget):
+    """La escala del dial: marcas finas y una aguja ámbar en el progreso de la descarga activa."""
+
+    def __init__(self):
+        super().__init__()
+        self.setMinimumHeight(54)
+        self.setMaximumHeight(54)
+        self._value = None  # None = sin descarga activa (aguja apagada)
+        self._busy = False
+        self._phase = 0.0
+        from PySide6.QtCore import QTimer
+        self._pulse = QTimer(self)
+        self._pulse.setInterval(50)
+        self._pulse.timeout.connect(self._tick)
+        self.setAccessibleName("Progreso de la descarga activa")
+
+    def set_value(self, v, busy=False):
+        """v: 0-100 o None (sin descarga activa). busy: activa pero sin porcentaje (la aguja late)."""
+        self._value = None if v is None else max(0.0, min(100.0, float(v)))
+        self._busy = bool(busy) and v is not None
+        if self._busy and not self._pulse.isActive():
+            self._pulse.start()
+        elif not self._busy:
+            self._pulse.stop()
+        desc = "Sin descargas activas" if v is None else ("Preparando la descarga" if self._busy else f"{self._value:.0f} %")
+        self.setAccessibleDescription(desc)
+        self.update()
+
+    def _tick(self):
+        self._phase = (self._phase + 0.05) % 1.0
+        self.update()
+
+    def paintEvent(self, e):
+        from PySide6.QtGui import QPen
+        from .theme import current, label_font
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        w, h = self.width(), self.height()
+        left, right = 10.0, w - 10.0
+        span = right - left
+        base = h - 18.0
+        line = QColor(current["line2"])
+        p.setPen(QPen(QColor(current["line"]), 1))
+        p.drawLine(QPointF(left, base), QPointF(right, base))
+        for i in range(0, 41):
+            x = left + span * i / 40
+            major = i % 10 == 0
+            mid = i % 5 == 0
+            p.setPen(QPen(QColor(current["muted"]) if major else line, 1))
+            top = base - (16 if major else 10 if mid else 6)
+            p.drawLine(QPointF(x, top), QPointF(x, base))
+        p.setFont(label_font(8, spacing=110))
+        p.setPen(QColor(current["muted"]))
+        for i, lab in enumerate(("0", "25", "50", "75", "100")):
+            x = left + span * i / 4
+            p.drawText(QRectF(x - 20, base + 3, 40, 14), Qt.AlignHCenter | Qt.AlignTop, lab)
+        if self._value is None:
+            x = left
+            col = QColor(current["faint"])
+        else:
+            import math
+            x = left + span * self._value / 100
+            col = QColor(current["amber"])
+            if self._busy:
+                col.setAlphaF(0.45 + 0.55 * (0.5 + 0.5 * math.sin(self._phase * 2 * math.pi)))
+        p.setPen(QPen(col, 2))
+        p.drawLine(QPointF(x, 2), QPointF(x, base + 1))
+        p.setPen(Qt.NoPen)
+        p.setBrush(col)
+        p.drawEllipse(QPointF(x, 3), 3, 3)
+        p.end()
+
+
+class FolderButton(QPushButton):
+    """Botón compacto que muestra el nombre de la carpeta y abre el selector al pulsarlo."""
+    changed = Signal(str)
+
+    def __init__(self, path=""):
+        super().__init__()
+        self.setObjectName("TileButton")
+        self.setCursor(Qt.PointingHandCursor)
+        self.clicked.connect(self.browse)
+        self.set_path(path)
+
+    def path(self):
+        return self._path
+
+    def set_path(self, p):
+        self._path = p or ""
+        name = os.path.basename(os.path.normpath(self._path)) if self._path else "Elegir…"
+        self.setText(name or self._path)
+        self.setToolTip(self._path)
+        self.setAccessibleName(f"Carpeta de destino: {self._path}")
+        self.changed.emit(self._path)
+
+    def browse(self):
+        p = QFileDialog.getExistingDirectory(self, "Elegir carpeta", self._path or os.path.expanduser("~"))
+        if p:
+            self.set_path(os.path.normpath(p))
+
+
+def tile(caption, widget):
+    """Casilla de opción: etiqueta en versalitas y el control debajo, sin bordes propios."""
+    f = QFrame()
+    f.setObjectName("Tile")
+    lay = QVBoxLayout(f)
+    lay.setContentsMargins(12, 8, 12, 6)
+    lay.setSpacing(1)
+    l = QLabel(caption.upper())
+    l.setObjectName("Label")
+    l.setBuddy(widget)
+    lay.addWidget(l)
+    lay.addWidget(widget)
+    widget.setAccessibleName(caption)
+    # Foco visible: el borde de la casilla se ilumina cuando cualquiera de sus controles tiene el foco
+    flt = _TileFocus(f)
+    for w in [widget] + widget.findChildren(QWidget):
+        w.installEventFilter(flt)
+    f._focus_filter = flt
+    return f
+
+
+class _TileFocus(QObject):
+    def __init__(self, frame):
+        super().__init__(frame)
+        self.frame = frame
+
+    def eventFilter(self, obj, ev):
+        from PySide6.QtCore import QEvent
+        if ev.type() in (QEvent.FocusIn, QEvent.FocusOut):
+            on = ev.type() == QEvent.FocusIn
+            if self.frame.property("focused") != on:
+                self.frame.setProperty("focused", on)
+                self.frame.style().unpolish(self.frame)
+                self.frame.style().polish(self.frame)
+        return False

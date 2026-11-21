@@ -1,0 +1,595 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-21T01:01:39Z",
+  "title": "Design System: DVDY Studio",
+  "extensions": {
+    "colorMeta": {
+      "graphite": {
+        "role": "neutral",
+        "displayName": "Night Graphite",
+        "canonical": "#131315",
+        "oklch": "oklch(18.8% 0.004 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424243",
+          "#616163",
+          "#828285",
+          "#a5a5a7",
+          "#c9c9cb",
+          "#eeeeef"
+        ]
+      },
+      "graphite-panel": {
+        "role": "neutral",
+        "displayName": "Faceplate Graphite",
+        "canonical": "#1d1d21",
+        "oklch": "oklch(23.2% 0.008 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#424245",
+          "#616165",
+          "#828287",
+          "#a4a4a9",
+          "#c9c9cc",
+          "#eeeef0"
+        ]
+      },
+      "graphite-raised": {
+        "role": "neutral",
+        "displayName": "Raised Graphite",
+        "canonical": "#24242a",
+        "oklch": "oklch(26.3% 0.011 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#414146",
+          "#606067",
+          "#818189",
+          "#a4a4ab",
+          "#c8c8ce",
+          "#eeeef2"
+        ]
+      },
+      "hairline": {
+        "role": "neutral",
+        "displayName": "Hairline",
+        "canonical": "#2a2a30",
+        "oklch": "oklch(28.7% 0.011 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252527",
+          "#414146",
+          "#606067",
+          "#818189",
+          "#a4a4ab",
+          "#c8c8ce",
+          "#eeeef1"
+        ]
+      },
+      "hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline",
+        "canonical": "#3a3a42",
+        "oklch": "oklch(35.2% 0.014 286)",
+        "tonalRamp": [
+          "#0b0b0d",
+          "#252528",
+          "#414147",
+          "#606069",
+          "#81818a",
+          "#a4a4ad",
+          "#c8c8cf",
+          "#eeeef2"
+        ]
+      },
+      "ivory": {
+        "role": "neutral",
+        "displayName": "Valve Ivory",
+        "canonical": "#f4ede0",
+        "oklch": "oklch(94.8% 0.019 83)",
+        "tonalRamp": [
+          "#0c0b09",
+          "#272520",
+          "#45413a",
+          "#666056",
+          "#888276",
+          "#aaa499",
+          "#cdc9c0",
+          "#f1eee9"
+        ]
+      },
+      "ash": {
+        "role": "neutral",
+        "displayName": "Ash",
+        "canonical": "#8c8a86",
+        "oklch": "oklch(63.4% 0.006 85)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#262523",
+          "#43423f",
+          "#63615d",
+          "#84827e",
+          "#a7a5a1",
+          "#cac9c6",
+          "#efeeec"
+        ]
+      },
+      "smoke": {
+        "role": "neutral",
+        "displayName": "Smoke",
+        "canonical": "#5f5d5a",
+        "oklch": "oklch(47.9% 0.005 78)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#262524",
+          "#434240",
+          "#63615e",
+          "#84827f",
+          "#a7a5a2",
+          "#cac9c6",
+          "#efeeed"
+        ]
+      },
+      "dial-amber": {
+        "role": "primary",
+        "displayName": "Dial Amber",
+        "canonical": "#e9a23b",
+        "oklch": "oklch(76.4% 0.142 72)",
+        "tonalRamp": [
+          "#140800",
+          "#381f00",
+          "#623700",
+          "#8f5000",
+          "#b57100",
+          "#d79639",
+          "#f0bf82",
+          "#ffe9c3"
+        ]
+      },
+      "ember-red": {
+        "role": "secondary",
+        "displayName": "Ember Red",
+        "canonical": "#c8553d",
+        "oklch": "oklch(59.3% 0.152 33)",
+        "tonalRamp": [
+          "#180503",
+          "#40160d",
+          "#702617",
+          "#a43822",
+          "#cd5941",
+          "#f08169",
+          "#ffb19d",
+          "#ffe0d3"
+        ]
+      },
+      "ember-red-text": {
+        "role": "secondary",
+        "displayName": "Ember Red (text)",
+        "canonical": "#e07a63",
+        "oklch": "oklch(68.9% 0.132 34)",
+        "tonalRamp": [
+          "#170603",
+          "#3d1910",
+          "#6b2c1e",
+          "#9c412d",
+          "#c4614b",
+          "#e78771",
+          "#fdb4a3",
+          "#ffe2d6"
+        ]
+      },
+      "console-black": {
+        "role": "neutral",
+        "displayName": "Console Black",
+        "canonical": "#0f0f11",
+        "oklch": "oklch(16.9% 0.004 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424243",
+          "#616163",
+          "#828285",
+          "#a5a5a7",
+          "#c9c9cb",
+          "#eeeeef"
+        ]
+      },
+      "light-ground": {
+        "role": "neutral",
+        "displayName": "Paper Ground (light)",
+        "canonical": "#ecebe7",
+        "oklch": "oklch(94.0% 0.005 95)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#252524",
+          "#424240",
+          "#62615e",
+          "#83827f",
+          "#a6a5a1",
+          "#cac9c6",
+          "#efeeed"
+        ]
+      },
+      "light-panel": {
+        "role": "neutral",
+        "displayName": "Paper Panel (light)",
+        "canonical": "#f8f7f4",
+        "oklch": "oklch(97.6% 0.004 91)",
+        "tonalRamp": [
+          "#0b0b0b",
+          "#252524",
+          "#424240",
+          "#62615f",
+          "#838280",
+          "#a6a5a2",
+          "#cac9c7",
+          "#efeeed"
+        ]
+      },
+      "light-raised": {
+        "role": "neutral",
+        "displayName": "Paper Raised (light)",
+        "canonical": "#f1f0ec",
+        "oklch": "oklch(95.5% 0.005 95)",
+        "tonalRamp": [
+          "#0b0b0a",
+          "#252524",
+          "#424240",
+          "#62615e",
+          "#83827f",
+          "#a6a5a1",
+          "#cac9c6",
+          "#efeeed"
+        ]
+      },
+      "light-hairline": {
+        "role": "neutral",
+        "displayName": "Hairline (light)",
+        "canonical": "#dddad3",
+        "oklch": "oklch(88.9% 0.010 87)",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#44423e",
+          "#63615b",
+          "#85827c",
+          "#a7a59f",
+          "#cbc9c4",
+          "#f0eeeb"
+        ]
+      },
+      "light-hairline-strong": {
+        "role": "neutral",
+        "displayName": "Strong Hairline (light)",
+        "canonical": "#c4c0b7",
+        "oklch": "oklch(80.8% 0.013 87)",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262522",
+          "#44423c",
+          "#646159",
+          "#86827a",
+          "#a8a59d",
+          "#ccc9c3",
+          "#f0eeea"
+        ]
+      },
+      "light-ink": {
+        "role": "neutral",
+        "displayName": "Ink (light)",
+        "canonical": "#18181a",
+        "oklch": "oklch(21.0% 0.004 286)",
+        "tonalRamp": [
+          "#0b0b0c",
+          "#252526",
+          "#424243",
+          "#616163",
+          "#828285",
+          "#a5a5a7",
+          "#c9c9cb",
+          "#eeeeef"
+        ]
+      },
+      "light-ash": {
+        "role": "neutral",
+        "displayName": "Ash (light)",
+        "canonical": "#64615b",
+        "oklch": "oklch(49.3% 0.010 85)",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262523",
+          "#44423e",
+          "#64615b",
+          "#85827c",
+          "#a8a59f",
+          "#cbc9c4",
+          "#f0eeeb"
+        ]
+      },
+      "light-smoke": {
+        "role": "neutral",
+        "displayName": "Smoke (light)",
+        "canonical": "#9a968e",
+        "oklch": "oklch(67.4% 0.012 85)",
+        "tonalRamp": [
+          "#0c0b0a",
+          "#262522",
+          "#44423d",
+          "#64615a",
+          "#86827a",
+          "#a8a59d",
+          "#ccc9c3",
+          "#f0eeeb"
+        ]
+      },
+      "light-amber": {
+        "role": "primary",
+        "displayName": "Dial Amber (light)",
+        "canonical": "#c9821c",
+        "oklch": "oklch(66.5% 0.137 69)",
+        "tonalRamp": [
+          "#140800",
+          "#381e00",
+          "#623600",
+          "#904f00",
+          "#b67000",
+          "#d89541",
+          "#f1bf86",
+          "#ffe8c5"
+        ]
+      },
+      "light-amber-text": {
+        "role": "primary",
+        "displayName": "Amber Text (light)",
+        "canonical": "#8f5508",
+        "oklch": "oklch(50.5% 0.110 65)",
+        "tonalRamp": [
+          "#130801",
+          "#361f07",
+          "#5e380a",
+          "#8a520b",
+          "#af7332",
+          "#d2975d",
+          "#ecc096",
+          "#ffe9cf"
+        ]
+      },
+      "light-ember-red": {
+        "role": "secondary",
+        "displayName": "Ember Red (light)",
+        "canonical": "#a8402c",
+        "oklch": "oklch(51.1% 0.141 33)",
+        "tonalRamp": [
+          "#170503",
+          "#3f170f",
+          "#6d291c",
+          "#a03d2a",
+          "#c85d48",
+          "#eb846e",
+          "#ffb3a1",
+          "#ffe1d5"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "title": {
+        "displayName": "Title",
+        "purpose": "Page titles; 17pt bold Archivo."
+      },
+      "body": {
+        "displayName": "Body",
+        "purpose": "Default for every widget; weight 600-700 for titles, buttons and active nav."
+      },
+      "body-strong": {
+        "displayName": "Body Strong",
+        "purpose": "Item titles, primary button, active nav item."
+      },
+      "small": {
+        "displayName": "Small",
+        "purpose": "Hints, summaries, metadata, small buttons, console."
+      },
+      "label": {
+        "displayName": "Faceplate Label",
+        "purpose": "Uppercase tracked captions: tiles, panel headings, tabs, table headers, mode switch."
+      },
+      "band": {
+        "displayName": "Band",
+        "purpose": "VIDEO / MÚSICA band selector labels (700 when selected)."
+      },
+      "wordmark": {
+        "displayName": "Wordmark",
+        "purpose": "DVDY·STUDIO in the top bar, interpunct in amber."
+      }
+    },
+    "themes": {
+      "dark": {
+        "primary": true,
+        "ground": "graphite",
+        "panel": "graphite-panel",
+        "text": "ivory",
+        "accent": "dial-amber"
+      },
+      "light": {
+        "primary": false,
+        "ground": "light-ground",
+        "panel": "light-panel",
+        "text": "light-ink",
+        "accent": "light-amber",
+        "accentText": "light-amber-text",
+        "console": "#f4f3ef",
+        "trigger": "Windows light mode, or Ajustes > Claro"
+      }
+    },
+    "derivedColors": [
+      {
+        "name": "ivory-overlay-hover",
+        "value": "rgba(244,237,224,0.07)",
+        "purpose": "Text colour at alpha 18/255: hover on buttons, nav, list items."
+      },
+      {
+        "name": "ivory-overlay-selected",
+        "value": "rgba(244,237,224,0.12)",
+        "purpose": "Text colour at alpha 30/255: pressed, selected rows, menu highlight."
+      }
+    ],
+    "shadows": [],
+    "motion": [
+      {
+        "name": "toggle",
+        "value": "160ms cubic-bezier(0.65, 0, 0.35, 1)",
+        "purpose": "Toggle switch knob and track (Qt InOutCubic)."
+      },
+      {
+        "name": "needle-pulse",
+        "value": "50ms frame, opacity 0.45 to 1.0 sine, 1s period",
+        "purpose": "Dial needle while a download is preparing without a percentage."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "dial-panel-min",
+        "value": "380px"
+      },
+      {
+        "name": "dial-panel-max",
+        "value": "460px"
+      }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Button (Descargar)",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "The one ivory slab per screen, anchored at the foot of the working panel.",
+      "html": "<button class=\"ds-btn-primary\">Descargar</button>",
+      "css": ".ds-btn-primary { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 10.5pt; font-weight: 700; background: #f4ede0; color: #131315; border: 1px solid #f4ede0; border-radius: 10px; padding: 11px 30px; cursor: pointer; } .ds-btn-primary:hover { background: #8c8a86; border-color: #8c8a86; } .ds-btn-primary:focus-visible { outline: none; box-shadow: inset 0 0 0 2px #131315; } .ds-btn-primary:disabled { background: #2a2a30; border-color: #2a2a30; color: #5f5d5a; }"
+    },
+    {
+      "name": "Secondary Button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Default outlined button (Pegar, Examinar, Usar selección).",
+      "html": "<button class=\"ds-btn\">Pegar</button>",
+      "css": ".ds-btn { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 10.5pt; font-weight: 600; background: transparent; color: #f4ede0; border: 1px solid #3a3a42; border-radius: 8px; padding: 7px 14px; cursor: pointer; } .ds-btn:hover { background: rgba(244,237,224,0.07); } .ds-btn:active { background: rgba(244,237,224,0.12); } .ds-btn:focus-visible { outline: none; border-color: #f4ede0; }"
+    },
+    {
+      "name": "Link Field",
+      "kind": "input",
+      "refersTo": "input-url",
+      "description": "The large paste field at the top of the download panel; a recessed well in ground colour.",
+      "html": "<input class=\"ds-input-url\" placeholder=\"Pega el enlace de un video, una canción o una playlist…\">",
+      "css": ".ds-input-url { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 10.5pt; width: 100%; height: 54px; box-sizing: border-box; background: #131315; color: #f4ede0; border: 1px solid #3a3a42; border-radius: 10px; padding: 14px 16px; } .ds-input-url::placeholder { color: #8c8a86; } .ds-input-url:focus-visible { outline: none; border-color: #f4ede0; }"
+    },
+    {
+      "name": "Option Tile",
+      "kind": "card",
+      "refersTo": "option-tile",
+      "description": "One of the four essential-option cells: narrow uppercase caption over a borderless value.",
+      "html": "<label class=\"ds-tile\"><span class=\"ds-tile-cap\">Calidad</span><span class=\"ds-tile-val\">1080p <svg width=\"11\" height=\"11\" viewBox=\"0 0 12 12\"><path d=\"M3 4.5l3 3 3-3\" fill=\"none\" stroke=\"#8c8a86\" stroke-width=\"1.4\"/></svg></span></label>",
+      "css": ".ds-tile { display: inline-flex; flex-direction: column; gap: 1px; min-width: 150px; padding: 8px 12px 6px; border: 1px solid #2a2a30; border-radius: 9px; background: transparent; cursor: pointer; } .ds-tile:hover { border-color: #3a3a42; } .ds-tile-cap { font-family: 'Archivo Narrow', 'Archivo', sans-serif; font-size: 9pt; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; color: #8c8a86; } .ds-tile-val { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 10.5pt; font-weight: 600; color: #f4ede0; display: flex; justify-content: space-between; align-items: center; } .ds-tile:focus-within .ds-tile-val { text-decoration: underline; }"
+    },
+    {
+      "name": "Band Selector",
+      "kind": "custom",
+      "refersTo": "band-active",
+      "description": "Video / Música picked like an AM/FM band: amber dot and bold ivory label when selected.",
+      "html": "<div class=\"ds-band\"><button class=\"ds-band-item\" aria-pressed=\"true\"><i></i>Video</button><button class=\"ds-band-item\" aria-pressed=\"false\"><i></i>Música</button></div>",
+      "css": ".ds-band { display: flex; gap: 26px; } .ds-band-item { font-family: 'Archivo Narrow', 'Archivo', sans-serif; font-size: 10.5pt; font-weight: 600; letter-spacing: 0.18em; text-transform: uppercase; color: #8c8a86; background: none; border: none; height: 34px; display: flex; align-items: center; gap: 10px; cursor: pointer; border-radius: 5px; } .ds-band-item i { width: 10px; height: 10px; border-radius: 50%; border: 1.2px solid #8c8a86; box-sizing: border-box; } .ds-band-item:hover { color: #f4ede0; } .ds-band-item[aria-pressed=\"true\"] { color: #f4ede0; font-weight: 700; } .ds-band-item[aria-pressed=\"true\"] i { background: #e9a23b; border-color: #e9a23b; } .ds-band-item:focus-visible { outline: 1px solid #f4ede0; outline-offset: 2px; }"
+    },
+    {
+      "name": "Dial Strip",
+      "kind": "custom",
+      "refersTo": "progress-active",
+      "description": "Tick scale with the amber needle at the active download's progress.",
+      "html": "<svg class=\"ds-dial\" viewBox=\"0 0 400 54\" width=\"400\" height=\"54\"><line x1=\"10\" y1=\"36\" x2=\"390\" y2=\"36\" stroke=\"#2a2a30\"/><g stroke=\"#3a3a42\"><path d=\"M19.5 30V36M29 30V36M38.5 30V36M48 30V36M67 30V36M76.5 30V36M86 30V36M95.5 30V36M114.5 30V36M124 30V36M133.5 30V36M143 30V36M162 30V36M171.5 30V36M181 30V36M190.5 30V36M209.5 30V36M219 30V36M228.5 30V36M238 30V36M257 30V36M266.5 30V36M276 30V36M285.5 30V36M304.5 30V36M314 30V36M323.5 30V36M333 30V36M352 30V36M361.5 30V36M371 30V36M380.5 30V36\"/><path d=\"M57.5 26V36M152.5 26V36M247.5 26V36M342.5 26V36\"/></g><g stroke=\"#8c8a86\"><path d=\"M10 20V36M105 20V36M200 20V36M295 20V36M390 20V36\"/></g><g fill=\"#8c8a86\" font-family=\"Archivo Narrow, sans-serif\" font-size=\"10\" text-anchor=\"middle\" letter-spacing=\"1\"><text x=\"10\" y=\"49\">0</text><text x=\"105\" y=\"49\">25</text><text x=\"200\" y=\"49\">50</text><text x=\"295\" y=\"49\">75</text><text x=\"390\" y=\"49\">100</text></g><line x1=\"257\" y1=\"2\" x2=\"257\" y2=\"37\" stroke=\"#e9a23b\" stroke-width=\"2\"/><circle cx=\"257\" cy=\"3\" r=\"3\" fill=\"#e9a23b\"/></svg>",
+      "css": ".ds-dial { display: block; background: #1d1d21; }"
+    },
+    {
+      "name": "Queue Row",
+      "kind": "custom",
+      "refersTo": "task-cover",
+      "description": "One download on the dial: cover, title, status, 3px progress, small actions, hairline below.",
+      "html": "<div class=\"ds-row\"><div class=\"ds-row-cover\"></div><div class=\"ds-row-mid\"><div class=\"ds-row-title\">Me at the zoo</div><div class=\"ds-row-status\">Bajando · 62 %</div><div class=\"ds-row-bar\"><span style=\"width:62%\"></span></div><div class=\"ds-row-actions\"><button class=\"ds-btn-sm\">Pausar</button><button class=\"ds-btn-sm\">Cancelar</button></div></div></div>",
+      "css": ".ds-row { display: flex; gap: 14px; padding: 12px 0; border-bottom: 1px solid #2a2a30; font-family: 'Archivo', 'Segoe UI', sans-serif; } .ds-row-cover { width: 56px; height: 56px; border-radius: 6px; background: #24242a; flex: none; } .ds-row-mid { flex: 1; display: flex; flex-direction: column; gap: 4px; } .ds-row-title { font-size: 10.5pt; font-weight: 700; color: #f4ede0; } .ds-row-status { font-size: 9pt; color: #e9a23b; } .ds-row-bar { height: 3px; background: #2a2a30; border-radius: 2px; } .ds-row-bar span { display: block; height: 100%; background: #e9a23b; border-radius: 2px; } .ds-row-actions { display: flex; gap: 6px; padding-top: 4px; } .ds-btn-sm { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 9pt; font-weight: 600; color: #f4ede0; background: transparent; border: 1px solid #3a3a42; border-radius: 6px; padding: 4px 10px; cursor: pointer; } .ds-btn-sm:hover { background: rgba(244,237,224,0.07); } .ds-btn-sm:focus-visible { outline: none; border-color: #f4ede0; }"
+    },
+    {
+      "name": "Top Navigation",
+      "kind": "nav",
+      "refersTo": "nav-item-active",
+      "description": "Wordmark with amber interpunct, text nav with ivory underline on the active item, running-downloads dot.",
+      "html": "<nav class=\"ds-nav\"><span class=\"ds-wordmark\">DVDY<b>·</b>STUDIO</span><a class=\"ds-nav-item is-active\" href=\"#\">Descargar</a><span class=\"ds-nav-dot\"></span><a class=\"ds-nav-item\" href=\"#\">Playlists</a><a class=\"ds-nav-item\" href=\"#\">Buscar</a><a class=\"ds-nav-item\" href=\"#\">Ajustes</a></nav>",
+      "css": ".ds-nav { display: flex; align-items: center; gap: 4px; padding: 10px 28px; background: #131315; border-bottom: 1px solid #2a2a30; } .ds-wordmark { font-family: 'Archivo Narrow', 'Archivo', sans-serif; font-size: 17pt; font-weight: 700; letter-spacing: 1px; color: #f4ede0; margin-right: 24px; } .ds-wordmark b { color: #e9a23b; } .ds-nav-item { font-family: 'Archivo', 'Segoe UI', sans-serif; font-size: 10.5pt; font-weight: 500; color: #8c8a86; text-decoration: none; padding: 7px 12px; border-radius: 6px; } .ds-nav-item:hover { color: #f4ede0; background: rgba(244,237,224,0.07); } .ds-nav-item.is-active { color: #f4ede0; font-weight: 700; border-radius: 0; border-bottom: 2px solid #f4ede0; } .ds-nav-item:focus-visible { outline: 1px dashed #8c8a86; } .ds-nav-dot { width: 6px; height: 6px; border-radius: 3px; background: #e9a23b; }"
+    },
+    {
+      "name": "Toggle Switch",
+      "kind": "custom",
+      "refersTo": "toggle-switch",
+      "description": "Simple / Avanzado switch: hairline track off, ivory track on; amber ring only on focus.",
+      "html": "<label class=\"ds-mode\"><span>Simple</span><input type=\"checkbox\" class=\"ds-switch\" checked><span class=\"on\">Avanzado</span></label>",
+      "css": ".ds-mode { display: inline-flex; align-items: center; gap: 8px; font-family: 'Archivo Narrow', 'Archivo', sans-serif; font-size: 9pt; font-weight: 600; letter-spacing: 1px; color: #8c8a86; } .ds-mode .on { color: #f4ede0; font-weight: 700; } .ds-switch { appearance: none; width: 44px; height: 24px; border-radius: 12px; background: #3a3a42; position: relative; cursor: pointer; transition: background 160ms cubic-bezier(0.65,0,0.35,1); margin: 0; } .ds-switch::after { content: ''; position: absolute; top: 3px; left: 3px; width: 18px; height: 18px; border-radius: 50%; background: #f4ede0; transition: left 160ms cubic-bezier(0.65,0,0.35,1), background 160ms; } .ds-switch:checked { background: #f4ede0; } .ds-switch:checked::after { left: 23px; background: #131315; } .ds-switch:focus-visible { outline: 1.5px solid #e9a23b; outline-offset: -1px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "Radio de Madrugada",
+    "overview": "The app is a radio left on at night. Graphite chrome, ivory type, and a single amber light that marks only what is playing now: here, what is downloading. Everything else is quiet. Panels are flat graphite slabs separated by hairlines rather than shadows; labels are set like the printing on a tuner faceplate, narrow, uppercase and tracked; the one moving part is the dial needle sliding across a scale of fine ticks.\n\nColour has two homes and only two: the cover art of whatever was pasted, shown large and untinted, and the amber light. Interaction uses ivory, not amber: the primary button is an ivory slab, focus is an ivory outline, the selected nav item is ivory text with an ivory underline. That keeps amber legible as a status signal instead of a brand tint. The system refuses the dark developer tool with a neon accent and a sidebar of forms; options live in four bordered tiles on one panel, and advanced controls fold away behind \"Más opciones\".\n\nDark is the primary rendition. A light rendition of the same world (warm paper ground, ink type, deeper amber) is used when Windows is in light mode or the user picks \"Claro\"; it keeps every rule, only the values change.",
+    "keyCharacteristics": [
+      "Graphite ground, graphite panels, hairline borders; no shadows anywhere.",
+      "Ivory is the interaction colour; amber is a status light, never a decoration.",
+      "Archivo for reading, Archivo Narrow uppercase tracked for labels, bands and numerals.",
+      "Three type sizes (9pt, 10.5pt, 17pt).",
+      "Covers shown large, untinted, with gently rounded corners.",
+      "Custom-painted radio pieces: the band selector, the tick dial with amber needle, the toggle switch."
+    ],
+    "rules": [
+      {
+        "name": "The One Light Rule",
+        "section": "colors",
+        "body": "Amber means \"on air now\". It appears only on something that is actively downloading or currently selected as the band or tool. If nothing is playing, the screen has no amber except the wordmark's interpunct. Never use amber for a button, a link, a hover, or a heading."
+      },
+      {
+        "name": "The Wordmark Exception",
+        "section": "colors",
+        "body": "The interpunct in DVDY·STUDIO is painted amber permanently: the needle's mark on the faceplate. It is the only standing amber in the app and is not a precedent for any other element."
+      },
+      {
+        "name": "The Untinted Cover Rule",
+        "section": "colors",
+        "body": "Cover art is shown as is: no overlays, no duotone, no colour wash. It is the only full colour on screen."
+      },
+      {
+        "name": "The Three Sizes Rule",
+        "section": "typography",
+        "body": "Every piece of text is 9pt, 10.5pt or 17pt. Hierarchy below the title comes from weight, colour (ivory vs ash) and the narrow uppercase label face, never from a new size."
+      },
+      {
+        "name": "The Faceplate Rule",
+        "section": "typography",
+        "body": "Uppercase is only ever set in Archivo Narrow with tracking; Archivo itself is always sentence case."
+      },
+      {
+        "name": "The No-Shadow Rule",
+        "section": "elevation",
+        "body": "Separation comes from a tonal step plus a hairline. Never add a drop shadow, glow, or blur to a panel, menu, or button."
+      }
+    ],
+    "dos": [
+      "Do keep amber for the thing that is downloading now, the selected band and the selected tool; check the screen with nothing downloading and confirm the only amber left is the wordmark's interpunct.",
+      "Do use ivory for every interactive emphasis: the primary button, focus outlines, checked states, active nav and tab underlines.",
+      "Do separate surfaces with a one-step tonal change and a 1px hairline.",
+      "Do set every label, band name, tab, table header and dial numeral in Archivo Narrow, uppercase, tracked about 1px.",
+      "Do stay within 9pt, 10.5pt and 17pt.",
+      "Do show cover art large and untinted on graphite raised, rounded 8px (6px at thumbnail size).",
+      "Do give the light rendition the same structure and rules, swapping only the values."
+    ],
+    "donts": [
+      "Don't use amber on buttons, links, hovers, headings or decorative accents.",
+      "Don't add drop shadows, glows or blurs.",
+      "Don't introduce a second accent colour or tint cover art.",
+      "Don't set Archivo (the reading face) in uppercase, or add a fourth text size.",
+      "Don't turn the options into a sidebar of form fields; essential options sit in the four tiles, the rest behind \"Más opciones\"."
+    ]
+  }
+}

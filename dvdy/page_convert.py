@@ -44,19 +44,19 @@ SAMPLE_RATES = [("Original", ""), ("48000 Hz", "48000"), ("44100 Hz", "44100"), 
 CHANNELS = [("Original", ""), ("Estéreo", "2"), ("Mono", "1"), ("5.1", "6")]
 
 QUICK_PRESETS = [
-    ("Personalizado", None),
-    ("Video → MP3 320 kbps", {"fmt": "mp3", "ab": "320k"}),
-    ("Video → M4A AAC 256 kbps", {"fmt": "m4a", "ab": "256k"}),
-    ("Audio → FLAC (sin pérdida)", {"fmt": "flac"}),
-    ("Audio → WAV", {"fmt": "wav"}),
-    ("Audio → Opus 128 kbps", {"fmt": "opus", "ab": "128k"}),
-    ("Video → MP4 compatible (H.264 + AAC)", {"fmt": "mp4", "vc": "libx264", "crf": 21, "preset": "medium", "ac": "aac", "ab": "192k", "yuv": True}),
-    ("Video → MP4 pequeño (H.265)", {"fmt": "mp4", "vc": "libx265", "crf": 26, "preset": "medium", "ac": "aac", "ab": "128k"}),
-    ("Video → WebM (VP9 + Opus)", {"fmt": "webm", "vc": "libvpx-vp9", "crf": 32, "ac": "libopus", "ab": "128k"}),
-    ("Video → 720p para compartir", {"fmt": "mp4", "vc": "libx264", "crf": 23, "res": "720", "ac": "aac", "ab": "128k", "yuv": True}),
-    ("Cambiar contenedor a MKV (sin recodificar)", {"fmt": "mkv", "vc": "copy", "ac": "copy"}),
-    ("Cambiar contenedor a MP4 (sin recodificar)", {"fmt": "mp4", "vc": "copy", "ac": "copy"}),
-    ("Video → GIF (480 px, 12 fps)", {"fmt": "gif", "res": "480", "fps": "12"}),
+    ("Personalizado (elegir cada opción)", None),
+    ("MP3 · música en alta calidad", {"fmt": "mp3", "ab": "320k"}),
+    ("M4A · música para iPhone y Mac", {"fmt": "m4a", "ab": "256k"}),
+    ("FLAC · música sin pérdida de calidad", {"fmt": "flac"}),
+    ("WAV · música sin comprimir", {"fmt": "wav"}),
+    ("Opus · música liviana", {"fmt": "opus", "ab": "128k"}),
+    ("MP4 · video que se abre en todos lados", {"fmt": "mp4", "vc": "libx264", "crf": 21, "preset": "medium", "ac": "aac", "ab": "192k", "yuv": True}),
+    ("MP4 · video más liviano (H.265)", {"fmt": "mp4", "vc": "libx265", "crf": 26, "preset": "medium", "ac": "aac", "ab": "128k"}),
+    ("WebM · video para la web", {"fmt": "webm", "vc": "libvpx-vp9", "crf": 32, "ac": "libopus", "ab": "128k"}),
+    ("MP4 720p · para mandar por mensaje", {"fmt": "mp4", "vc": "libx264", "crf": 23, "res": "720", "ac": "aac", "ab": "128k", "yuv": True}),
+    ("MKV · sin recodificar (instantáneo)", {"fmt": "mkv", "vc": "copy", "ac": "copy"}),
+    ("MP4 · sin recodificar (instantáneo)", {"fmt": "mp4", "vc": "copy", "ac": "copy"}),
+    ("GIF animado", {"fmt": "gif", "res": "480", "fps": "12"}),
 ]
 
 AUTO_ACODEC = {"mp3": "libmp3lame", "m4a": "aac", "aac": "aac", "flac": "flac", "wav": "pcm_s16le",
@@ -98,8 +98,8 @@ def video_quality_args(vc, crf, preset):
 
 class ConvertPage(Page):
     def __init__(self, manager, go_queue):
-        super().__init__("Convertir", "Convierte archivos por lotes con FFmpeg: MP4 → MP3, cambia formato, códec, "
-                                      "resolución, calidad, volumen y más.")
+        super().__init__("Convertir", "Pasa tus archivos a otro formato, por ejemplo de video a MP3. "
+                                      "Puedes convertir varios a la vez.")
         self.manager = manager
         self.go_queue = go_queue
 
@@ -115,7 +115,9 @@ class ConvertPage(Page):
         self.preset.currentIndexChanged.connect(self._apply_preset)
         self.fmt = combo(OUT_FORMATS, "mp3")
         self.fmt.currentIndexChanged.connect(self._update_enabled)
-        lay.addWidget(row(field("Ajuste rápido", self.preset), field("Formato", self.fmt)))
+        self.preset_field = field("Convertir a", self.preset)
+        self.fmt_field = field("Formato", self.fmt)
+        lay.addWidget(row(self.preset_field, self.fmt_field))
         self.add(c)
 
         # ---- Video ----
@@ -219,6 +221,11 @@ class ConvertPage(Page):
         self.simple = simple
         self.adv_card.setVisible(not simple)
         self.cmd_card.setVisible(not simple)
+        self.fmt_field.setVisible(not simple)
+        # En Simple no se ofrece «Personalizado»: se elige un destino concreto
+        self.preset.view().setRowHidden(0, simple)
+        if simple and self.preset.currentIndex() == 0:
+            self.preset.setCurrentIndex(1)
         if simple:
             # Sin recorte ni extras ocultos que el usuario no pueda ver
             self.start.clear()

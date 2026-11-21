@@ -73,6 +73,8 @@ class InspectPage(Page):
         while self.grid.count():
             w = self.grid.takeAt(0).widget()
             if w:
+                w.hide()
+                w.setParent(None)
                 w.deleteLater()
         items = [
             ("Formato", fmt.get("format_long_name") or fmt.get("format_name")),
@@ -183,7 +185,8 @@ class HistoryPage(Page):
                 it = QTableWidgetItem(v)
                 it.setToolTip(v)
                 if not exists and c == 3:
-                    it.setForeground(QColor("#8a90a3"))
+                    from .theme import current as _c
+                    it.setForeground(QColor(_c["muted"]))
                 self.table.setItem(r, c, it)
             self.table.item(r, 0).setData(Qt.UserRole, i)
 

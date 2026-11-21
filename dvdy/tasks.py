@@ -36,7 +36,11 @@ class Task:
         self.speed = ""
         self.eta = ""
         self.output = ""
-        self.error = ""
+        self.error = ""          # mensaje en español para la interfaz
+        self.error_raw = ""      # texto técnico original (Ver detalles / Registro)
+        self.error_action = None  # acción sugerida (ver errors.py)
+        self.thumb = ""          # URL de la miniatura o carátula
+        self.note = ""           # aviso no fatal para mostrar al terminar
         self.warnings = 0
         self.manager = None
         self._stop = threading.Event()
@@ -196,8 +200,10 @@ class TaskManager(QObject):
                 task.status = PAUSED if task._pause else CANCELED
             else:
                 task.status = ERROR
-                task.error = _clean_error(str(e))
-                task.log("error", task.error)
+                from .errors import friendly
+                task.error_raw = _clean_error(str(e))
+                task.error, task.error_action = friendly(task.error_raw)
+                task.log("error", task.error_raw)
         task.speed = task.eta = ""
         if task.status == PAUSED:
             task.detail = "Pausado — se reanudará donde quedó"
@@ -206,7 +212,7 @@ class TaskManager(QObject):
         elif task.status == ERROR:
             task.detail = task.error
         elif task.status == DONE:
-            task.detail = "Completado" + (f" con {task.warnings} aviso(s)" if task.warnings else "")
+            task.detail = task.note or "Listo"
             try:
                 if task.kind != "other":
                     history.add(task.title, task.history_kind(), task.output, getattr(task, "url", ""))
@@ -246,10 +252,8 @@ class _YDLLogger:
         m = re.match(r"\[(\w+)\]", msg)
         if m and m.group(1) not in ("download",) and self.task.status == RUNNING:
             stage = m.group(1)
-            if stage in ("Merger", "ExtractAudio", "VideoRemuxer", "EmbedThumbnail", "Metadata",
-                         "FFmpegMetadata", "SponsorBlock", "ModifyChapters", "SplitChapters",
-                         "EmbedSubtitle", "ThumbnailsConvertor", "VideoConvertor", "FixupM3u8"):
-                self.task.detail = f"Procesando ({stage})…"
+            if stage in STAGES:
+                self.task.detail = STAGES[stage]
                 self.task.emit()
 
     def warning(self, msg):
@@ -260,12 +264,25 @@ class _YDLLogger:
         self.task.log("error", _clean_error(msg))
 
 
+STAGES = {
+    "Merger": "Uniendo video y audio…", "ExtractAudio": "Convirtiendo a audio…",
+    "VideoRemuxer": "Preparando el archivo…", "VideoConvertor": "Convirtiendo el video…",
+    "EmbedThumbnail": "Agregando la carátula…", "ThumbnailsConvertor": "Preparando la carátula…",
+    "Metadata": "Agregando título y artista…", "FFmpegMetadata": "Agregando título y artista…",
+    "MetadataParser": "Leyendo título y artista…", "SponsorBlock": "Buscando patrocinios…",
+    "ModifyChapters": "Ajustando capítulos…", "SplitChapters": "Separando por capítulos…",
+    "EmbedSubtitle": "Agregando subtítulos…", "SubtitlesConvertor": "Preparando subtítulos…",
+    "FixupM3u8": "Reparando el archivo…", "FixupM4a": "Reparando el archivo…", "MoveFiles": "Guardando…",
+}
+
+
 class DownloadTask(Task):
     kind = "download"
     can_pause = True
 
-    def __init__(self, url, opts, title=None, label="Video"):
+    def __init__(self, url, opts, title=None, label="Video", thumb=""):
         super().__init__(title or url)
+        self.thumb = thumb or ""
         self.url = url
         self.opts = opts
         self.label = label
@@ -280,6 +297,8 @@ class DownloadTask(Task):
             import yt_dlp
             raise yt_dlp.utils.DownloadCancelled("Detenido por el usuario")
         info = d.get("info_dict") or {}
+        if not self.thumb and info.get("thumbnail"):
+            self.thumb = info["thumbnail"]
         if not self._title_known and info.get("title"):
             if not info.get("playlist_index"):
                 self.title = info["title"]
@@ -304,10 +323,10 @@ class DownloadTask(Task):
             self.speed = f"{fmt_size(sp)}/s" if sp else ""
             self.eta = fmt_time(d.get("eta")) if d.get("eta") is not None else ""
             size = f"{fmt_size(done)} de {fmt_size(total)}" if total else fmt_size(done)
-            self.detail = f"{prefix}{name} · {size}"
+            self.detail = f"{prefix}{name} · {size}" if prefix else size
             self.emit()
         elif status == "finished":
-            self.detail = f"{prefix}Descarga terminada, procesando…"
+            self.detail = f"{prefix}Terminando el archivo…"
             self.speed = self.eta = ""
             self.emit(True)
 
@@ -316,7 +335,7 @@ class DownloadTask(Task):
             import yt_dlp
             raise yt_dlp.utils.DownloadCancelled("Detenido por el usuario")
         if d.get("status") == "started":
-            self.detail = f"Procesando ({d.get('postprocessor')})…"
+            self.detail = STAGES.get(d.get("postprocessor"), "Terminando el archivo…")
             self.progress = -1
             self.emit(True)
 
@@ -336,8 +355,22 @@ class DownloadTask(Task):
         self.detail = "Obteniendo información…"
         self.emit(True)
         self.log("info", f"Iniciando: {self.url}")
-        with yt_dlp.YoutubeDL(opts) as ydl:
-            code = ydl.download([self.url])
+        try:
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                code = ydl.download([self.url])
+        except Exception as e:  # noqa: BLE001
+            from .errors import is_cookie_error
+            if self.stopped or not opts.get("cookiesfrombrowser") or not is_cookie_error(str(e)):
+                raise
+            # Las cookies del navegador no se pudieron leer (p. ej. Chrome abierto): reintentar sin ellas
+            self.log("warning", "No se pudieron leer las cookies del navegador; se reintenta sin ellas.")
+            opts.pop("cookiesfrombrowser", None)
+            self.opts.pop("cookiesfrombrowser", None)
+            self.note = "Listo · bajado sin las cookies del navegador"
+            self.detail = "Reintentando sin las cookies del navegador…"
+            self.emit(True)
+            with yt_dlp.YoutubeDL(opts) as ydl:
+                code = ydl.download([self.url])
         if self.stopped:
             return
         if not self.output and opts.get("paths", {}).get("home"):

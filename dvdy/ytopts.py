@@ -281,3 +281,25 @@ def info_opts(flat=False):
     if flat:
         o["extract_flat"] = "in_playlist"
     return o
+
+
+def extract_info(url, flat=False, noplaylist=False):
+    """Obtiene la información de un enlace sin descargar.
+
+    Si las cookies del navegador no se pueden leer (por ejemplo, Chrome abierto),
+    reintenta sin ellas en lugar de fallar.
+    """
+    import yt_dlp
+    from .errors import is_cookie_error
+    o = info_opts(flat=flat)
+    if noplaylist:
+        o["noplaylist"] = True
+    try:
+        with yt_dlp.YoutubeDL(o) as ydl:
+            return ydl.sanitize_info(ydl.extract_info(url, download=False))
+    except Exception as e:  # noqa: BLE001
+        if not o.get("cookiesfrombrowser") or not is_cookie_error(str(e)):
+            raise
+        o.pop("cookiesfrombrowser", None)
+        with yt_dlp.YoutubeDL(o) as ydl:
+            return ydl.sanitize_info(ydl.extract_info(url, download=False))

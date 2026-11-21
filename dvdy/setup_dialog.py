@@ -19,10 +19,10 @@ class _Signals(QObject):
 def component_state(key):
     if key == "ffmpeg":
         p = find_ffmpeg()
-        return f"Instalado ({p})" if p else None
+        return "Instalado" if p else None
     if key == "deno":
         name, p = find_js_runtime()
-        return f"Instalado: {name} ({p})" if name else None
+        return "Instalado" if name else None
     if key == "yt-dlp":
         try:
             import yt_dlp
@@ -78,7 +78,7 @@ class SetupDialog(QDialog):
             d.setWordWrap(True)
             col.addWidget(d)
             state = component_state(key)
-            s = QLabel(f"✔ {state}" if state else "✖ No encontrado")
+            s = QLabel(state if state else "No está instalado")
             s.setObjectName("OkText" if state else "ErrText")
             s.setWordWrap(True)
             col.addWidget(s)

@@ -24,7 +24,7 @@ def make_icon(path):
     from PySide6.QtGui import QGuiApplication, QImageWriter
     app = QGuiApplication.instance() or QGuiApplication(sys.argv[:1])  # noqa: F841
     from dvdy.theme import app_icon
-    icon = app_icon("#7c5cff")
+    icon = app_icon()
     os.makedirs(os.path.dirname(path), exist_ok=True)
     w = QImageWriter(path, b"ico")
     if not w.canWrite():
@@ -55,6 +55,7 @@ def main():
         "--icon", icon,
         "--paths", ROOT,
         "--collect-submodules", "dvdy",
+        "--add-data", os.path.join(ROOT, "dvdy", "assets") + os.pathsep + os.path.join("dvdy", "assets"),  # tipografías (OFL)
         "--collect-submodules", "yt_dlp",
         "--collect-all", "yt_dlp_ejs",
         "--collect-submodules", "mutagen",

@@ -5,7 +5,7 @@ import threading
 import time
 
 APP_NAME = "DVDY Studio"
-APP_VERSION = "2.0.1"
+APP_VERSION = "2.1.0"
 
 CONFIG_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "DVDY Studio")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
@@ -42,8 +42,7 @@ DEFAULTS = {
     "use_archive": False,
     "clipboard_monitor": False,
     "notify_on_finish": True,
-    "theme": "dark",
-    "accent": "#7c5cff",
+    "theme": "auto",  # auto = sigue a Windows; también "dark" o "light"
     "window_geometry": None,
     "ui_mode": "advanced",
     "skip_component_check": "",
@@ -61,6 +60,11 @@ class Config:
                 self._data.update(json.load(f))
         except (OSError, ValueError):
             pass
+        # v2.1: identidad nueva. El tema pasa a seguir a Windows y el color de acento ya no es configurable.
+        if self._data.get("config_version", 1) < 2:
+            self._data["theme"] = "auto"
+            self._data.pop("accent", None)
+            self._data["config_version"] = 2
 
     def save(self):
         os.makedirs(CONFIG_DIR, exist_ok=True)

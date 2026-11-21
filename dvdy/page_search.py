@@ -19,8 +19,8 @@ def _search(prefix, query, n):
         url = f"https://music.youtube.com/search?q={quote(query)}#songs"
     else:
         url = f"{prefix}{n}:{query}"
-    with yt_dlp.YoutubeDL(o) as ydl:
-        info = ydl.sanitize_info(ydl.extract_info(url, download=False))
+    from .ytopts import extract_info
+    info = extract_info(url, flat=True)
     return [e for e in (info.get("entries") or []) if e][:n]
 
 
@@ -46,17 +46,25 @@ class ResultCard(QFrame):
         mid.addStretch(1)
         url = entry.get("webpage_url") or entry.get("url")
         self.url = url
-        mid.addWidget(row(button("Video", lambda: page.quick(url, entry, False)),
-                          button("Audio", lambda: page.quick(url, entry, True)),
-                          button("Opciones…", lambda: page.open_download.emit(url), flat=True), None))
+        self.vbtn = button("Bajar video")
+        self.abtn = button("Bajar música")
+        self.vbtn.clicked.connect(lambda: self._quick(page, url, entry, False, self.vbtn))
+        self.abtn.clicked.connect(lambda: self._quick(page, url, entry, True, self.abtn))
+        mid.addWidget(row(self.vbtn, self.abtn,
+                          button("Más opciones", lambda: page.open_download.emit(url), flat=True), None))
         lay.addLayout(mid, 1)
+
+    def _quick(self, page, url, entry, audio, btn):
+        page.quick(url, entry, audio)
+        btn.setText("Agregado al dial")
+        btn.setEnabled(False)
 
 
 class SearchPage(Page):
     open_download = Signal(str)
 
     def __init__(self, manager, go_queue):
-        super().__init__("Buscar", "Busca sin salir de la app y descarga con la configuración predeterminada de Ajustes.")
+        super().__init__("Buscar", "Busca y baja con un clic, con la calidad elegida en Ajustes.")
         self.manager = manager
         self.go_queue = go_queue
         self.query = QLineEdit()
@@ -79,6 +87,9 @@ class SearchPage(Page):
         self.add(self.results)
         self.body.addStretch(1)
 
+    def set_simple(self, simple):
+        self.count.setVisible(not simple)
+
     def search(self):
         q = self.query.text().strip()
         if not q:
@@ -90,20 +101,24 @@ class SearchPage(Page):
 
     def _err(self, msg):
         self.btn.setEnabled(True)
-        self.status.setText(f"Error: {msg}")
+        from .errors import friendly
+        self.status.setText(friendly(msg)[0])
 
     def _show(self, entries):
         self.btn.setEnabled(True)
         while self.rl.count():
             w = self.rl.takeAt(0).widget()
             if w:
+                w.hide()
+                w.setParent(None)
                 w.deleteLater()
         for e in entries:
             self.rl.addWidget(ResultCard(e, self))
-        self.status.setText(f"{len(entries)} resultados" if entries else "Sin resultados")
+        self.status.setText(f"{len(entries)} resultados" if entries else "No se encontró nada. Prueba con otras palabras.")
 
     def quick(self, url, entry, audio):
         choices = default_choices(audio)
         self.manager.add(DownloadTask(url, build_opts(choices), title=entry.get("title"),
-                                      label="Audio" if audio else "Video"))
-        self.status.setText(f"Añadido a la cola: {entry.get('title')}")
+                                      label="Música" if audio else "Video",
+                                      thumb=best_thumbnail_url(entry) or ""))
+        self.status.setText(f"Agregado al dial (en Descargar): {entry.get('title')}")

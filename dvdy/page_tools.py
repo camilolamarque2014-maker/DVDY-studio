@@ -4,7 +4,7 @@ import shlex
 import shutil
 import tempfile
 
-from PySide6.QtCore import Qt
+from PySide6.QtCore import QSize, Qt
 from PySide6.QtWidgets import (
     QCheckBox, QDoubleSpinBox, QHBoxLayout, QLineEdit, QListWidget, QListWidgetItem, QMessageBox,
     QSpinBox, QStackedWidget, QVBoxLayout, QWidget,
@@ -753,18 +753,68 @@ class ToolsPage(QWidget):
         from .theme import icon_font
         self.stack = QStackedWidget()
         from PySide6.QtWidgets import QScrollArea, QFrame
-        for tool in TOOLS:
-            it = QListWidgetItem(tool.name)
-            it.setToolTip(tool.desc)
-            self.list.addItem(it)
-            sa = QScrollArea()
-            sa.setWidgetResizable(True)
-            sa.setFrameShape(QFrame.NoFrame)
-            sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
-            sa.setWidget(ToolForm(tool, self))
-            self.stack.addWidget(sa)
-        self.list.currentRowChanged.connect(self.stack.setCurrentIndex)
-        self.list.setCurrentRow(0)
+        from .theme import label_font
+        self.list.setVerticalScrollBarPolicy(Qt.ScrollBarAsNeeded)
+        self.list.setAccessibleName("Herramientas")
+        by_name = {t.name: t for t in TOOLS}
+        stack_index = 0
+        for group, names in TOOL_GROUPS:
+            head = QListWidgetItem(group.upper())
+            head.setFlags(Qt.NoItemFlags)
+            head.setFont(label_font())
+            head.setData(Qt.UserRole, None)
+            head.setSizeHint(QSize(0, 34))
+            self.list.addItem(head)
+            for name in names:
+                tool = by_name[name]
+                it = QListWidgetItem(tool.name)
+                it.setToolTip(tool.desc)
+                it.setData(Qt.UserRole, stack_index)
+                self.list.addItem(it)
+                sa = QScrollArea()
+                sa.setWidgetResizable(True)
+                sa.setFrameShape(QFrame.NoFrame)
+                sa.setHorizontalScrollBarPolicy(Qt.ScrollBarAlwaysOff)
+                sa.setWidget(ToolForm(tool, self))
+                self.stack.addWidget(sa)
+                stack_index += 1
+        self.list.currentItemChanged.connect(self._select)
+        self.list.setCurrentRow(1)
         content.addWidget(self.list)
         content.addWidget(self.stack, 1)
         outer.addLayout(content, 1)
+
+    def _select(self, item, previous):
+        """Muestra la herramienta elegida y la marca con el punto ámbar de la banda."""
+        if item is None or item.data(Qt.UserRole) is None:
+            return
+        if previous is not None and previous.data(Qt.UserRole) is not None:
+            previous.setIcon(_dot_icon(False))
+        item.setIcon(_dot_icon(True))
+        self.stack.setCurrentIndex(item.data(Qt.UserRole))
+
+
+def _dot_icon(on):
+    from PySide6.QtGui import QColor, QIcon, QPainter, QPixmap
+    from .theme import current
+    pm = QPixmap(12, 12)
+    pm.fill(Qt.transparent)
+    if on:
+        p = QPainter(pm)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.setPen(Qt.NoPen)
+        p.setBrush(QColor(current["amber"]))
+        p.drawEllipse(2, 2, 8, 8)
+        p.end()
+    return QIcon(pm)
+
+
+TOOL_GROUPS = [
+    ("Cortar y unir", ["Recortar fragmento", "Unir archivos", "Dividir en partes", "Comprimir a un tamaño",
+                       "Comando personalizado"]),
+    ("Audio", ["Extraer audio", "Quitar audio", "Reemplazar o mezclar audio", "Normalizar volumen", "Ajustar volumen",
+               "Eliminar silencios", "Fundido de entrada y salida"]),
+    ("Imagen y video", ["Crear GIF", "Cambiar velocidad", "Rotar o voltear", "Recortar encuadre / redimensionar",
+                        "Capturas de fotogramas", "Marca de agua", "Imagen + audio → video", "Invertir (reproducir al revés)"]),
+    ("Subtítulos y datos", ["Subtítulos", "Metadatos y carátula"]),
+]

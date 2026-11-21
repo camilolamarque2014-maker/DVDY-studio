@@ -103,7 +103,11 @@ def main():
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
     app.setStyle("Fusion")
-    app.setStyleSheet(build_qss(cfg["theme"], cfg["accent"]))
+    from dvdy.theme import load_fonts, resolve_theme
+    load_fonts()
+    from dvdy.theme import apply_palette
+    apply_palette(app, resolve_theme(cfg["theme"]))
+    app.setStyleSheet(build_qss(resolve_theme(cfg["theme"])))
     if "--selftest" in sys.argv:
         return _selftest(sys.argv[sys.argv.index("--selftest") + 1])
     win = MainWindow()
