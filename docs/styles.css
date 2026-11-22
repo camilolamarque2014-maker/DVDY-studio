@@ -1,0 +1,224 @@
+/* DVDY Studio · sitio web. Identidad «Radio de Madrugada» (ver DESIGN.md):
+   grafito, marfil y una sola luz ámbar reservada para lo activo. */
+
+@font-face { font-family: "Archivo"; src: url("assets/fonts/Archivo-Variable.ttf") format("truetype");
+             font-weight: 100 900; font-stretch: 62% 125%; font-display: swap; }
+@font-face { font-family: "Archivo Narrow"; src: url("assets/fonts/ArchivoNarrow-Variable.ttf") format("truetype");
+             font-weight: 400 700; font-display: swap; }
+
+:root {
+  --bg: #131315; --panel: #1d1d21; --raised: #24242a; --line: #2a2a30; --line2: #3a3a42;
+  --text: #f4ede0; --muted: #8c8a86; --faint: #5f5d5a; --amber: #e9a23b; --amber-text: #e9a23b;
+  --on-text: #131315; --err: #e07a63;
+  /* Movimiento (ux-motion): entrar con ease-out, salir con ease-in, desplazarse con ease-in-out */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-inout: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-press: 100ms; --t-hover: 120ms; --t-ui: 200ms; --t-enter: 300ms;
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: light) {
+  :root {
+    --bg: #ecebe7; --panel: #f8f7f4; --raised: #f1f0ec; --line: #dddad3; --line2: #c4c0b7;
+    --text: #18181a; --muted: #64615b; --faint: #9a968e; --amber: #c9821c; --amber-text: #8f5508;
+    --on-text: #f8f7f4; --err: #a8402c;
+    color-scheme: light;
+  }
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+body { background: var(--bg); color: var(--text); font: 400 17px/1.55 "Archivo", "Segoe UI", system-ui, sans-serif;
+       -webkit-font-smoothing: antialiased; overflow-x: hidden; }
+::selection { background: var(--text); color: var(--on-text); }
+a { color: inherit; text-underline-offset: 3px; }
+img { display: block; max-width: 100%; height: auto; }
+code { font: 500 0.92em "Archivo Narrow", "Archivo", sans-serif; letter-spacing: 0.02em;
+       background: var(--raised); padding: 1px 6px; border-radius: 5px; white-space: nowrap; }
+:focus-visible { outline: 2px dashed var(--muted); outline-offset: 3px; border-radius: 6px; }
+.skip { position: absolute; left: -9999px; top: 8px; background: var(--text); color: var(--on-text); padding: 8px 14px; border-radius: 8px; }
+.skip:focus { left: 12px; z-index: 10; }
+
+/* Voz de etiqueta: Archivo Narrow en versalitas espaciadas */
+.label { font: 600 13px/1 "Archivo Narrow", sans-serif; letter-spacing: 0.16em; text-transform: uppercase; color: var(--muted); }
+.hint { font-size: 14px; color: var(--muted); }
+.hint a { color: var(--muted); }
+.hint a:hover { color: var(--text); }
+
+/* ---------------- Barra superior ---------------- */
+.top { position: sticky; top: 0; z-index: 5; display: flex; align-items: center; gap: 28px;
+       padding: 14px clamp(16px, 4vw, 48px); background: color-mix(in srgb, var(--bg) 92%, transparent);
+       border-bottom: 1px solid var(--line); backdrop-filter: blur(10px); }
+.wordmark { font: 700 22px/1 "Archivo Narrow", sans-serif; letter-spacing: 0.06em; text-decoration: none; white-space: nowrap; }
+.wordmark.small { font-size: 16px; }
+.dot { color: var(--amber); }
+.nav { display: flex; gap: 6px; margin-right: auto; }
+.nav a { padding: 10px 12px; border-radius: 8px; color: var(--muted); text-decoration: none; font-weight: 500;
+         transition: color var(--t-hover) var(--ease-out), background var(--t-hover) var(--ease-out); }
+.nav a:hover { color: var(--text); background: color-mix(in srgb, var(--text) 7%, transparent); }
+
+/* ---------------- Botones ---------------- */
+.btn { position: relative; display: inline-flex; align-items: center; justify-content: center; gap: 10px;
+       min-height: 48px; padding: 0 22px; border: 1px solid var(--line2); border-radius: 10px;
+       font: 600 16px/1 "Archivo", sans-serif; color: var(--text); text-decoration: none; background: transparent; cursor: pointer;
+       transition: background var(--t-hover) var(--ease-out), border-color var(--t-hover) var(--ease-out),
+                   transform var(--t-press) var(--ease-out), box-shadow var(--t-hover) var(--ease-out); }
+.btn:hover { background: color-mix(in srgb, var(--text) 7%, transparent); }
+/* Presión: el botón se hunde (solid drawing + feedback inmediato) */
+.btn:active { transform: translateY(1px) scale(0.97); }
+.btn-small { min-height: 40px; padding: 0 16px; font-size: 15px; }
+/* El único botón que resalta (Von Restorff): relleno marfil, o negro en el tema claro */
+.btn-primary { background: var(--text); color: var(--on-text); border-color: var(--text); font-weight: 700;
+               box-shadow: 0 1px 0 color-mix(in srgb, #fff 25%, transparent) inset, 0 6px 18px -8px rgb(0 0 0 / 0.55); }
+.btn-primary:hover { background: color-mix(in srgb, var(--text) 86%, var(--bg)); }
+.btn-big { min-height: 56px; padding: 0 32px; font-size: 18px; }
+.btn .check { width: 20px; height: 20px; fill: none; stroke: currentColor; stroke-width: 2.4; stroke-linecap: round;
+              stroke-linejoin: round; stroke-dasharray: 24; stroke-dashoffset: 24; display: none; }
+.btn.is-going .check { display: block; animation: draw 260ms var(--ease-out) 380ms forwards; }
+@keyframes draw { to { stroke-dashoffset: 0; } }
+
+/* ---------------- Portada ---------------- */
+.hero { display: grid; grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr); gap: clamp(32px, 5vw, 72px); align-items: center;
+        max-width: 1240px; margin: 0 auto; padding: clamp(48px, 8vw, 104px) clamp(16px, 4vw, 48px) clamp(56px, 8vw, 96px); }
+h1 { font: 800 clamp(42px, 6.2vw, 82px)/0.98 "Archivo", sans-serif; letter-spacing: -0.035em; font-stretch: 92%; }
+h2 { font: 800 clamp(30px, 4vw, 48px)/1.05 "Archivo", sans-serif; letter-spacing: -0.025em; font-stretch: 94%; }
+h3 { font: 700 20px/1.25 "Archivo", sans-serif; letter-spacing: -0.01em; }
+.lead { margin-top: 22px; max-width: 34em; font-size: clamp(17px, 1.5vw, 19px); color: color-mix(in srgb, var(--text) 82%, var(--bg)); }
+.cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 32px; }
+.hero-copy .hint { margin-top: 16px; }
+
+/* La demo del dial: el gesto característico de la app */
+.dial-demo { margin: 0; }
+.dial-demo figcaption { margin-top: 10px; text-align: center; }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 22px 22px 8px;
+         box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent) inset, 0 30px 60px -30px rgb(0 0 0 / 0.6); }
+.panel-head { display: flex; gap: 12px; align-items: baseline; }
+.scale { display: block; width: 100%; height: 54px; margin: 12px 0 4px; overflow: visible; }
+.scale .ticks line { stroke: var(--line2); stroke-width: 1; vector-effect: non-scaling-stroke; }
+.scale .ticks line.major { stroke: var(--muted); }
+.scale .nums text { fill: var(--muted); font: 600 9px "Archivo Narrow", sans-serif; letter-spacing: 0.05em; text-anchor: middle; }
+.scale .needle line { stroke: var(--amber); stroke-width: 2; vector-effect: non-scaling-stroke; }
+.scale .needle circle { fill: var(--amber); }
+/* Sin descarga activa la aguja se apaga: el ámbar es solo para lo que está bajando */
+.scale .needle line, .scale .needle circle { transition: stroke 300ms var(--ease-out), fill 300ms var(--ease-out); }
+.scale.is-idle .needle line { stroke: var(--faint); }
+.scale.is-idle .needle circle { fill: var(--faint); }
+.rows { list-style: none; }
+.row { display: grid; grid-template-columns: 56px 1fr auto; gap: 14px; align-items: start; padding: 14px 0; border-top: 1px solid var(--line); }
+.cover { width: 56px; height: 56px; border-radius: 7px; object-fit: cover; background: var(--raised); }
+.cover-blank { display: block; }
+.row-body { display: grid; gap: 4px; min-width: 0; }
+.row-body strong { font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.status { font-size: 13px; color: var(--muted); }
+.row.is-active .status { color: var(--amber-text); }
+.bar { display: block; height: 3px; background: var(--line); border-radius: 2px; overflow: hidden; }
+/* Las barras de progreso son lo único con movimiento lineal (ux-motion §5) */
+.bar i { display: block; height: 100%; width: 100%; background: var(--amber); transform-origin: left; transform: scaleX(0); }
+.actions { display: flex; gap: 6px; margin-top: 4px; opacity: 0; transform: translateY(4px);
+           transition: opacity var(--t-ui) var(--ease-out), transform var(--t-ui) var(--ease-out); }
+.chip { font-size: 12px; font-weight: 600; padding: 4px 10px; border-radius: 6px; border: 1px solid var(--line2); }
+.chip-primary { background: var(--text); color: var(--on-text); border-color: var(--text); }
+.done-check { width: 22px; height: 22px; fill: none; stroke: var(--text); stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round;
+              stroke-dasharray: 24; stroke-dashoffset: 24; margin-top: 2px; }
+.row.is-done .status { color: var(--muted); }
+.row.is-done .bar { opacity: 0; transition: opacity var(--t-ui) var(--ease-in); }
+.row.is-done .actions { opacity: 1; transform: none; }
+.row.is-done .done-check { animation: draw 300ms var(--ease-out) 120ms forwards; }
+
+/* ---------------- Secciones ---------------- */
+.section { max-width: 1240px; margin: 0 auto; padding: clamp(64px, 9vw, 120px) clamp(16px, 4vw, 48px) 0; }
+.section-lead { margin-top: 14px; color: var(--muted); font-size: 18px; max-width: 36em; }
+.steps { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(20px, 3vw, 40px); margin: 40px 0 48px; }
+.steps li { border-top: 1px solid var(--line2); padding-top: 20px; }
+.step-n { display: block; font: 700 15px/1 "Archivo Narrow", sans-serif; letter-spacing: 0.12em; color: var(--muted); margin-bottom: 14px; }
+.steps p { margin-top: 8px; color: var(--muted); }
+
+.shot { margin: 0; border-radius: 14px; overflow: hidden; border: 1px solid var(--line);
+        box-shadow: 0 1px 0 color-mix(in srgb, var(--text) 6%, transparent) inset, 0 40px 80px -40px rgb(0 0 0 / 0.65); }
+/* Profundidad: la captura se inclina levemente hacia el puntero (ux-motion §10) */
+.shot-wide { transform: perspective(1100px) rotateX(var(--rx, 0deg)) rotateY(var(--ry, 0deg));
+             transition: transform 300ms var(--ease-out); will-change: transform; }
+
+/* Selector de banda, como Video / Música en la app */
+.band { display: flex; flex-wrap: wrap; gap: 6px 28px; margin: 36px 0 28px; }
+.band button { position: relative; display: inline-flex; align-items: center; gap: 12px; min-height: 44px; padding: 0 4px;
+               background: none; border: 0; cursor: pointer; color: var(--muted);
+               font: 600 15px/1 "Archivo Narrow", sans-serif; letter-spacing: 0.16em; text-transform: uppercase;
+               transition: color var(--t-hover) var(--ease-out); }
+.band button::before { content: ""; width: 11px; height: 11px; border-radius: 50%; border: 1.4px solid currentColor;
+                       transition: background var(--t-hover) var(--ease-out), border-color var(--t-hover) var(--ease-out),
+                                   transform 150ms var(--ease-out); }
+.band button:hover { color: var(--text); }
+.band button[aria-selected="true"] { color: var(--text); font-weight: 700; }
+.band button[aria-selected="true"]::before { background: var(--amber); border-color: var(--amber); }
+.band button.pop::before { transform: scale(1.3); }
+
+.feature { display: grid; grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.6fr); gap: clamp(24px, 4vw, 56px); align-items: center; }
+.feature-text { position: relative; min-height: 180px; }
+.ft { transition: opacity var(--t-ui) var(--ease-out), transform var(--t-ui) var(--ease-out); }
+.ft p { margin-top: 12px; color: var(--muted); }
+.ft.is-leaving { opacity: 0; transform: translateY(-6px); transition-duration: 110ms; transition-timing-function: var(--ease-in); }
+.ft.is-entering { opacity: 0; transform: translateY(8px); }
+.js-feature-img { transition: opacity 180ms var(--ease-out); }
+.js-feature-img.is-swapping { opacity: 0; transition-duration: 100ms; transition-timing-function: var(--ease-in); }
+
+.facts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0 clamp(24px, 4vw, 64px); margin-top: 32px; }
+.facts div { padding: 22px 0; border-top: 1px solid var(--line); }
+.facts dt { font-weight: 700; font-size: 19px; }
+.facts dd { margin-top: 6px; color: var(--muted); }
+
+.faq { margin-top: 28px; max-width: 820px; }
+.faq details { border-top: 1px solid var(--line); }
+.faq details:last-child { border-bottom: 1px solid var(--line); }
+.faq summary { list-style: none; display: flex; justify-content: space-between; gap: 16px; align-items: center;
+               min-height: 60px; padding: 14px 0; cursor: pointer; font-weight: 600; font-size: 18px; }
+.faq summary::-webkit-details-marker { display: none; }
+.faq summary::after { content: ""; flex: none; width: 9px; height: 9px; border-right: 1.6px solid var(--muted); border-bottom: 1.6px solid var(--muted);
+                      transform: rotate(45deg) translateY(-3px); transition: transform 150ms var(--ease-inout); }
+.faq details[open] summary::after { transform: rotate(225deg) translateY(-3px); }
+.faq details p { padding: 0 0 20px; color: var(--muted); max-width: 46em; }
+.faq details[open] p { animation: faq-in 220ms var(--ease-out); }
+@keyframes faq-in { from { opacity: 0; transform: translateY(-4px); } }
+
+/* ---------------- Descargar (el final de la página) ---------------- */
+.download { margin-top: clamp(72px, 10vw, 128px); border-top: 1px solid var(--line); background: var(--panel); }
+.download-inner { max-width: 760px; margin: 0 auto; padding: clamp(64px, 9vw, 112px) clamp(16px, 4vw, 48px); text-align: center;
+                  display: grid; justify-items: center; gap: 0; }
+.download-inner .lead { margin: 16px auto 32px; }
+.download-inner .hint { margin-top: 12px; }
+
+.foot { display: flex; flex-wrap: wrap; gap: 12px 28px; align-items: center; justify-content: space-between;
+        padding: 28px clamp(16px, 4vw, 48px); border-top: 1px solid var(--line); }
+
+/* ---------------- Aparición al desplazarse ----------------
+   Entran una vez con ease-out (300 ms, 16 px). Los grupos aparecen en cascada de 40 ms. */
+.js [data-reveal], .js [data-stagger] > * { opacity: 0; transform: translateY(16px);
+  transition: opacity var(--t-enter) var(--ease-out), transform var(--t-enter) var(--ease-out);
+  transition-delay: calc(var(--i, 0) * 40ms); }
+.js .is-in[data-reveal], .js .is-in[data-stagger] > * { opacity: 1; transform: none; }
+
+/* ---------------- Celular ---------------- */
+@media (max-width: 900px) {
+  .hero { grid-template-columns: 1fr; }
+  .feature { grid-template-columns: 1fr; }
+  .feature-text { min-height: 0; }
+}
+@media (max-width: 720px) {
+  .nav { display: none; }
+  .top { justify-content: space-between; }
+  .steps { grid-template-columns: 1fr; margin-bottom: 36px; }
+  .facts { grid-template-columns: 1fr; }
+  .cta-row .btn { flex: 1 1 100%; }
+  .band { gap: 4px 20px; }
+}
+
+/* ---------------- Menos movimiento ----------------
+   Sin desplazamientos ni inclinaciones: solo cambios de opacidad breves. */
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  *, *::before, *::after { transition-duration: 80ms !important; animation-duration: 1ms !important; animation-delay: 0ms !important; }
+  .js [data-reveal], .js [data-stagger] > * { transform: none; transition-delay: 0ms; }
+  .shot-wide { transform: none !important; }
+  .btn:active { transform: none; }
+  .band button.pop::before { transform: none; }
+}

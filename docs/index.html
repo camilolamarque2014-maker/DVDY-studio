@@ -1,0 +1,204 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>DVDY Studio · Baja música y videos sin complicarte</title>
+<meta name="description" content="Programa gratis para Windows: descarga videos, música y playlists de YouTube y +1800 sitios, con carátulas y datos, y convierte audio y video. Sin instalar Python.">
+<meta name="theme-color" content="#131315" media="(prefers-color-scheme: dark)">
+<meta name="theme-color" content="#ecebe7" media="(prefers-color-scheme: light)">
+<link rel="icon" href="assets/icon.svg" type="image/svg+xml">
+<link rel="preload" href="assets/fonts/Archivo-Variable.ttf" as="font" type="font/ttf" crossorigin>
+<link rel="stylesheet" href="styles.css">
+<script>document.documentElement.classList.add("js")</script>
+</head>
+<body>
+<a class="skip" href="#contenido">Saltar al contenido</a>
+
+<header class="top" id="arriba">
+  <a class="wordmark" href="#arriba" aria-label="DVDY Studio, inicio">DVDY<span class="dot">·</span>STUDIO</a>
+  <nav class="nav" aria-label="Secciones">
+    <a href="#como">Cómo se usa</a>
+    <a href="#funciones">Funciones</a>
+    <a href="#preguntas">Preguntas</a>
+  </nav>
+  <a class="btn btn-small" href="#descargar">Descargar</a>
+</header>
+
+<main id="contenido">
+
+  <!-- ============ Portada ============ -->
+  <section class="hero">
+    <div class="hero-copy" data-stagger>
+      <h1>Tu música y tus videos,<br>para guardar.</h1>
+      <p class="lead">Pega un enlace de YouTube o de más de 1800 sitios, elige video o música y listo. DVDY Studio baja el archivo con su carátula y su nombre, y te lo deja a mano para abrir.</p>
+      <div class="cta-row">
+        <a class="btn btn-primary js-download" href="https://github.com/camilolamarque2014-maker/DVDY-studio/releases/latest" data-label="Descargar para Windows">
+          <span class="btn-text">Descargar para Windows</span>
+          <svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+        </a>
+        <a class="btn" href="#como">Ver cómo se usa</a>
+      </div>
+      <p class="hint"><span class="js-version">Versión más reciente</span> · Gratis · Windows 10 y 11 · Sin instalar Python</p>
+    </div>
+
+    <!-- Demostración en vivo: el dial de la app -->
+    <figure class="dial-demo" aria-label="Demostración: así se ve una descarga en la app">
+      <div class="panel">
+        <div class="panel-head">
+          <span class="label">En el dial</span>
+          <span class="hint js-dial-count">1 bajando</span>
+        </div>
+        <svg class="scale" viewBox="0 0 400 54" preserveAspectRatio="none" aria-hidden="true">
+          <g class="ticks"></g>
+          <g class="nums"></g>
+          <g class="needle"><line x1="10" x2="10" y1="2" y2="37"/><circle cx="10" cy="3" r="3"/></g>
+        </svg>
+        <ul class="rows">
+          <li class="row is-active">
+            <img class="cover" src="assets/img/tapa-zoo-sq.webp" alt="" width="56" height="56">
+            <div class="row-body">
+              <strong>Me at the zoo</strong>
+              <span class="status js-status">Bajando 0 %</span>
+              <span class="bar"><i class="js-bar"></i></span>
+              <span class="actions js-actions"><span class="chip chip-primary">Abrir</span><span class="chip">Mostrar en la carpeta</span></span>
+            </div>
+            <svg class="done-check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+          </li>
+          <li class="row">
+            <span class="cover cover-blank" aria-hidden="true"></span>
+            <div class="row-body"><strong>Clase de guitarra · parte 2</strong><span class="status">En espera</span></div>
+          </li>
+          <li class="row">
+            <span class="cover cover-blank" aria-hidden="true"></span>
+            <div class="row-body"><strong>Mi playlist para el auto</strong><span class="status">Listo · 18 canciones</span></div>
+          </li>
+        </ul>
+      </div>
+      <figcaption class="hint">Demostración: así se ve una descarga en la app.</figcaption>
+    </figure>
+  </section>
+
+  <!-- ============ Cómo se usa ============ -->
+  <section class="section" id="como">
+    <h2 data-reveal>Tres pasos, sin vueltas</h2>
+    <ol class="steps" data-stagger>
+      <li>
+        <span class="step-n">1</span>
+        <h3>Pega el enlace</h3>
+        <p>El programa lo reconoce solo y te muestra la carátula, el título y la duración antes de bajar nada.</p>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <h3>Elige video o música</h3>
+        <p>Como cambiar de AM a FM. La calidad, el formato y la carpeta vienen bien elegidos; si quieres, los cambias.</p>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <h3>Ábrelo</h3>
+        <p>Cuando termina, el archivo aparece con su nombre y un botón para abrirlo o verlo en la carpeta.</p>
+      </li>
+    </ol>
+    <figure class="shot shot-wide" data-reveal>
+      <picture>
+        <source srcset="assets/img/light-02-descargar_analizado.webp" media="(prefers-color-scheme: light)">
+        <img src="assets/img/dark-02-descargar_analizado.webp" width="1320" height="860" loading="lazy"
+             alt="Pantalla Descargar de DVDY Studio: enlace pegado, video reconocido con su carátula y el botón Descargar.">
+      </picture>
+    </figure>
+  </section>
+
+  <!-- ============ Funciones (selector de banda) ============ -->
+  <section class="section" id="funciones">
+    <h2 data-reveal>Todo en un solo programa</h2>
+    <p class="section-lead" data-reveal>Descargar, convertir y editar, sin abrir la consola ni instalar nada más.</p>
+    <div class="band" role="tablist" aria-label="Funciones de DVDY Studio" data-reveal>
+      <button role="tab" aria-selected="true" aria-controls="f-panel" data-shot="dark-04-descargar_terminado" data-text="descargar">Descargar</button>
+      <button role="tab" aria-selected="false" aria-controls="f-panel" data-shot="dark-08-convertir_simple" data-text="convertir">Convertir</button>
+      <button role="tab" aria-selected="false" aria-controls="f-panel" data-shot="dark-13-avanzado_herramientas" data-text="herramientas">Herramientas</button>
+      <button role="tab" aria-selected="false" aria-controls="f-panel" data-shot="dark-11-avanzado_descargar" data-text="avanzado">Modo avanzado</button>
+    </div>
+    <div class="feature" id="f-panel" role="tabpanel" data-reveal>
+      <div class="feature-text">
+        <div class="ft" data-key="descargar">
+          <h3>Videos, música y playlists</h3>
+          <p>De 144p a 8K, en MP4 o MP3 y otros formatos. Las playlists se ven como una grilla de carátulas y eliges las canciones con un clic. Guarda título, artista y carátula dentro del archivo.</p>
+        </div>
+        <div class="ft" data-key="convertir" hidden>
+          <h3>Convierte lo que ya tienes</h3>
+          <p>Pasa un video a MP3, achica un archivo o cambia de formato. Arrastra varios a la vez y elige «Convertir a…». Sin opciones técnicas, salvo que las quieras.</p>
+        </div>
+        <div class="ft" data-key="herramientas" hidden>
+          <h3>22 herramientas de edición</h3>
+          <p>Recortar, unir, comprimir a un tamaño, crear GIF, normalizar el volumen, quitar silencios, agregar subtítulos o una carátula. Todo con FFmpeg por dentro.</p>
+        </div>
+        <div class="ft" data-key="avanzado" hidden>
+          <h3>Simple o avanzado, tú eliges</h3>
+          <p>El modo Simple muestra lo esencial. El Avanzado suma la tabla de formatos, subtítulos, SponsorBlock, capítulos, fragmentos y nombres de archivo a medida.</p>
+        </div>
+      </div>
+      <figure class="shot">
+        <img class="js-feature-img" src="assets/img/dark-04-descargar_terminado.webp" width="1320" height="860" loading="lazy"
+             alt="Captura de DVDY Studio">
+      </figure>
+    </div>
+  </section>
+
+  <!-- ============ Por qué ============ -->
+  <section class="section" id="detalles">
+    <h2 data-reveal>Pensado para que funcione a la primera</h2>
+    <dl class="facts" data-stagger>
+      <div><dt>Se instala solo lo que falta</dt><dd>Si tu PC no tiene FFmpeg o Deno, el programa ofrece bajarlos con un clic. Sin permisos de administrador.</dd></div>
+      <div><dt>Errores que se entienden</dt><dd>Si un video es privado o fue eliminado, te lo dice en español y te propone qué hacer.</dd></div>
+      <div><dt>Se actualiza solo</dt><dd>Cuando sale una versión nueva, te avisa con las novedades. Un clic y listo.</dd></div>
+      <div><dt>Gratis y abierto</dt><dd>Sin anuncios, sin cuentas y sin rastreo. El código está en GitHub.</dd></div>
+    </dl>
+  </section>
+
+  <!-- ============ Preguntas ============ -->
+  <section class="section" id="preguntas">
+    <h2 data-reveal>Preguntas frecuentes</h2>
+    <div class="faq" data-reveal>
+      <details>
+        <summary>¿Necesito instalar Python u otra cosa?</summary>
+        <p>No. Descomprimes el zip y abres <code>DVDY Studio.exe</code>. Si faltan FFmpeg o Deno, el programa te ofrece bajarlos solo.</p>
+      </details>
+      <details>
+        <summary>Windows dice que la app es «desconocida». ¿Es seguro?</summary>
+        <p>Aparece porque el programa no tiene una firma digital paga. Pulsa <b>Más información → Ejecutar de todas formas</b>. El código completo es público en GitHub.</p>
+      </details>
+      <details>
+        <summary>¿Funciona en Mac, Linux o el celular?</summary>
+        <p>Por ahora solo en Windows 10 y 11 de 64 bits.</p>
+      </details>
+      <details>
+        <summary>¿De qué sitios puedo bajar?</summary>
+        <p>YouTube, YouTube Music, TikTok, Instagram, SoundCloud y más de 1800 sitios compatibles con yt-dlp. Usa la herramienta solo con contenido que tengas derecho a descargar.</p>
+      </details>
+    </div>
+  </section>
+
+  <!-- ============ Descargar ============ -->
+  <section class="download" id="descargar">
+    <div class="download-inner" data-reveal>
+      <h2>Bájalo y pruébalo</h2>
+      <p class="lead">Un zip de unos 60 MB. Lo descomprimes donde quieras y abres <code>DVDY Studio.exe</code>.</p>
+      <a class="btn btn-primary btn-big js-download" href="https://github.com/camilolamarque2014-maker/DVDY-studio/releases/latest" data-label="Descargar para Windows">
+        <span class="btn-text">Descargar para Windows</span>
+        <svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
+      </a>
+      <p class="hint js-version">Versión más reciente en GitHub</p>
+      <p class="hint">Requiere Windows 10 u 11 de 64 bits.</p>
+    </div>
+  </section>
+</main>
+
+<footer class="foot">
+  <span class="wordmark small">DVDY<span class="dot">·</span>STUDIO</span>
+  <span class="hint">Hecho con <a href="https://github.com/yt-dlp/yt-dlp">yt-dlp</a>, <a href="https://ffmpeg.org">FFmpeg</a>, <a href="https://deno.com">Deno</a> y <a href="https://www.qt.io/qt-for-python">Qt</a>.</span>
+  <a class="hint" href="https://github.com/camilolamarque2014-maker/DVDY-studio">Código en GitHub</a>
+</footer>
+
+<script src="main.js" defer></script>
+</body>
+</html>
