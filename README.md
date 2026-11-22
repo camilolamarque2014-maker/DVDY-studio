@@ -2,9 +2,11 @@
 
 Interfaz gráfica para **yt-dlp** y **FFmpeg**. Sirve para descargar videos, música y playlists de YouTube y de más de 1800 sitios, y para convertir y editar video y audio. No hace falta usar la consola.
 
+**Sitio web y descarga:** https://camilolamarque2014-maker.github.io/DVDY-studio/
+
 ## Instalación (sin Python)
 
-1. Descarga `DVDY_Studio-windows-x64.zip` desde la sección **Releases**.
+1. Descarga el zip de la versión más reciente (`DVDY_Studio-vX.Y.Z-windows-x64.zip`) desde el [sitio web](https://camilolamarque2014-maker.github.io/DVDY-studio/) o la sección **Releases**.
 2. Descomprímelo donde quieras y abre **`DVDY Studio.exe`**.
 3. La primera vez, si no tienes **FFmpeg** o **Deno**, la app ofrece descargarlos e instalarlos automáticamente con un clic. Pesan unos 250 MB en total y no hace falta ser administrador.
 
