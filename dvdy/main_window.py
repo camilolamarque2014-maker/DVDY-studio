@@ -156,6 +156,7 @@ class MainWindow(QMainWindow):
         self._counts(0, 0)
         QTimer.singleShot(0, lambda: self.pages["download"].urls.setFocus())
         QTimer.singleShot(500, self.check_components)
+        QTimer.singleShot(1500, self.check_updates)
 
     # ------------------------------------------------------------------
     def _paint_wordmark(self):
@@ -285,6 +286,24 @@ class MainWindow(QMainWindow):
             self.tray.showMessage("Faltan componentes", "Puedes instalarlos cuando quieras desde Ajustes.",
                                   QSystemTrayIcon.Warning, 5000)
 
+    def check_updates(self):
+        """Consulta en segundo plano si hay una versión nueva publicada en GitHub."""
+        if not cfg["check_updates"]:
+            return
+        from .updater import newer_release
+        from .widgets import run_async
+        run_async(newer_release, cfg["skip_update_version"], on_done=self._show_update, on_error=lambda *_: None)
+
+    def _show_update(self, info):
+        if not info:
+            return
+        if QApplication.activeModalWidget() is not None:
+            # Hay otra ventana abierta (p. ej. componentes): reintentar en un momento
+            QTimer.singleShot(3000, lambda: self._show_update(info))
+            return
+        from .update_dialog import UpdateDialog
+        UpdateDialog(info, self.manager, self).exec()
+
     def set_advanced(self, advanced, save=True):
         simple = not advanced
         for key in ADVANCED_ONLY:
@@ -330,7 +349,7 @@ class MainWindow(QMainWindow):
     def closeEvent(self, e):
         cfg["window_geometry"] = bytes(self.saveGeometry().toBase64()).decode()
         cfg.save()
-        if self.manager.active_count():
+        if self.manager.active_count() and not getattr(self, "skip_close_prompt", False):
             from PySide6.QtWidgets import QMessageBox
             r = QMessageBox.question(self, "Hay descargas en curso",
                                      "Si cierras ahora, se detienen. Las descargas pausadas pueden seguir después. "

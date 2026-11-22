@@ -294,6 +294,7 @@ QTableCornerButton::section { background: transparent; border: none; }
 #Grid::item:selected { background: %(text)s; color: %(on_text)s; }
 #Grid::item:selected:hover { background: %(muted)s; color: %(on_text)s; }
 #Stage { background: transparent; border: none; }
+#Notes { background: %(raised)s; border: none; border-radius: 10px; padding: 10px 14px; }
 #Cover { background: %(raised)s; border-radius: 8px; color: %(muted)s; }
 #ToolList::item { padding: 8px 10px; border-radius: 7px; margin: 1px 0; color: %(muted)s; }
 #ToolList::item:hover { background: %(text_soft)s; color: %(text)s; }

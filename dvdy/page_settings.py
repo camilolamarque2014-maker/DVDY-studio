@@ -94,8 +94,11 @@ class SettingsPage(Page):
         self.clip.setChecked(cfg["clipboard_monitor"])
         self.notify = QCheckBox("Avisarme cuando termina cada descarga")
         self.notify.setChecked(cfg["notify_on_finish"])
+        self.updates = QCheckBox("Avisarme cuando haya una versión nueva de DVDY Studio")
+        self.updates.setChecked(cfg["check_updates"])
         lay.addWidget(self.clip)
         lay.addWidget(self.notify)
+        lay.addWidget(self.updates)
         self.add(c)
 
         # ---- Nombres (Avanzado) ----
@@ -170,7 +173,8 @@ class SettingsPage(Page):
             w.textChanged.connect(self._changed)
         for w in (self.def_quality, self.def_container, self.def_afmt, self.def_aq, self.browser):
             w.currentIndexChanged.connect(self._changed)
-        for w in (self.embed_meta, self.embed_thumb, self.use_archive, self.clip, self.notify, self.restrict, self.geo):
+        for w in (self.embed_meta, self.embed_thumb, self.use_archive, self.clip, self.notify, self.updates,
+                  self.restrict, self.geo):
             w.toggled.connect(self._changed)
         for w in (self.max_conc, self.frags, self.retries):
             w.valueChanged.connect(self._changed)
@@ -242,6 +246,9 @@ class SettingsPage(Page):
         cfg["theme"] = self.theme.value()
         cfg["clipboard_monitor"] = self.clip.isChecked()
         cfg["notify_on_finish"] = self.notify.isChecked()
+        if self.updates.isChecked() and not cfg["check_updates"]:
+            cfg["skip_update_version"] = ""  # al reactivar, volver a avisar de todo
+        cfg["check_updates"] = self.updates.isChecked()
         cfg.save()
         self.manager.schedule()
         self.saved_lbl.setText("Guardado")
