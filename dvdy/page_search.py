@@ -112,8 +112,12 @@ class SearchPage(Page):
                 w.hide()
                 w.setParent(None)
                 w.deleteLater()
+        from . import motion
+        cards = []
         for e in entries:
-            self.rl.addWidget(ResultCard(e, self))
+            cards.append(ResultCard(e, self))
+            self.rl.addWidget(cards[-1])
+        motion.stagger_in(cards)  # cascada de 40 ms; pasados 6 resultados, el resto entra junto
         self.status.setText(f"{len(entries)} resultados" if entries else "No se encontró nada. Prueba con otras palabras.")
 
     def quick(self, url, entry, audio):

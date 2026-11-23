@@ -327,6 +327,9 @@ class DownloadPage(QWidget):
         self.thumb.clear()
         self.thumb.show()
         load_thumbnail(best_thumbnail_url(info), self.thumb, (400, 225))
+        # La tapa aparece y, 40 ms después, el título y los datos (cascada corta)
+        from . import motion
+        motion.stagger_in([self.thumb, self.title_lbl, self.meta_lbl], ms=250)
         self.urls.setFocus()
         self._fill_formats(info.get("formats") or [])
         self.formats_box.setVisible(not self.simple and self.table.rowCount() > 0)

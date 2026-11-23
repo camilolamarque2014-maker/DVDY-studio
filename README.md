@@ -18,6 +18,8 @@ Los componentes descargados se guardan en `%LOCALAPPDATA%\DVDY Studio\bin`. La c
 
 Arriba del menú lateral hay un interruptor **Simple / Avanzado**. El modo Simple muestra solo lo esencial y el Avanzado muestra todas las opciones.
 
+La primera vez que abres la app aparece un tutorial corto de cinco pasos. Puedes volver a verlo desde **Ajustes → Ver el tutorial de nuevo**.
+
 | Sección | Qué hace |
 |---|---|
 | **Descargar** | Analiza un enlace y muestra miniatura, datos y la tabla de formatos. Descarga video y audio, solo audio o solo video, con calidad de 144p a 8K, eligiendo contenedor, códec y FPS. Incluye subtítulos, SponsorBlock, capítulos, fragmentos, miniatura e info JSON. |

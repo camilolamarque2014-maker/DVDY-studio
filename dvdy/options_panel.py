@@ -262,8 +262,31 @@ class OptionsPanel(QWidget):
         self.tabs.setFixedHeight(self.tabs.tabBar().sizeHint().height() + page.sizeHint().height() + 6)
 
     def _toggle_more(self, on):
-        self.tabs.setVisible(on)
+        """Abre en 220 ms (ease-out) y cierra en 120 ms (ease-in): cerrar siempre es más rápido."""
+        from . import motion
         self._update_more_label()
+        start = self.tabs.height() if self.tabs.isVisible() else 0
+        if on:
+            self.tabs.setVisible(True)
+            self._fit_tabs()
+            target = self.tabs.height()
+            if not motion.enabled():
+                return
+            self.tabs.setFixedHeight(start)
+            motion.fade(self.tabs, 0.0, 1.0, motion.ENTER, motion.ease_out())
+            motion.animate(self, "more", start, target, 220, motion.ease_out(),
+                           lambda v: self.tabs.setFixedHeight(int(v)), self._fit_tabs)
+        else:
+            def done():
+                self.tabs.setVisible(False)
+                self.tabs.setGraphicsEffect(None)
+                self._fit_tabs()
+            if not motion.enabled():
+                done()
+                return
+            motion.fade(self.tabs, 1.0, 0.0, motion.EXIT, motion.ease_in())
+            motion.animate(self, "more", start, 0, motion.EXIT, motion.ease_in(),
+                           lambda v: self.tabs.setFixedHeight(int(v)), done)
 
     def _active_extras(self):
         """Opciones de «Más opciones» que difieren de lo predeterminado."""

@@ -523,8 +523,9 @@ class ToggleSwitch(QAbstractButton):
         self.setFixedSize(44, 24)
         self._pos = 1.0 if checked else 0.0
         self._anim = QPropertyAnimation(self, b"knob", self)
-        self._anim.setDuration(160)
-        self._anim.setEasingCurve(QEasingCurve.InOutCubic)
+        self._anim.setDuration(200)
+        from . import motion
+        self._anim.setEasingCurve(motion.ease_in_out())  # se desplaza en pantalla: ease-in-out
         self.toggled.connect(self._animate)
 
     def _get_knob(self):
@@ -537,8 +538,12 @@ class ToggleSwitch(QAbstractButton):
     knob = Property(float, _get_knob, _set_knob)
 
     def _animate(self, on):
+        from . import motion
         self._anim.stop()
-        self._anim.setStartValue(self._pos)
+        if not motion.enabled():
+            self._set_knob(1.0 if on else 0.0)
+            return
+        self._anim.setStartValue(self._pos)  # desde donde esté: interrumpible
         self._anim.setEndValue(1.0 if on else 0.0)
         self._anim.start()
 
@@ -558,8 +563,10 @@ class ToggleSwitch(QAbstractButton):
         p.drawRoundedRect(r, r.height() / 2, r.height() / 2)
         d = self.height() - 6
         x = 3 + (self.width() - d - 6) * self._pos
+        # Squash & stretch: a mitad de camino la perilla se estira un poco y vuelve a ser redonda al llegar
+        stretch = 4 * self._pos * (1 - self._pos) * 7
         p.setBrush(QColor(current["bg"]) if self._pos > 0.5 else QColor(current["text"]))
-        p.drawEllipse(QRectF(x, 3, d, d))
+        p.drawRoundedRect(QRectF(x - stretch / 2, 3 + stretch / 10, d + stretch, d - stretch / 5), d / 2, d / 2)
         if self.hasFocus():
             p.setBrush(Qt.NoBrush)
             from PySide6.QtGui import QPen
@@ -629,6 +636,18 @@ class BandButton(QAbstractButton):
         self.setCursor(Qt.PointingHandCursor)
         self.setFocusPolicy(Qt.StrongFocus)
         self.setAccessibleName(text)
+        self._pop = 1.0
+        self.toggled.connect(self._on_toggled)
+
+    def _on_toggled(self, on):
+        # El punto se enciende con un pequeño latido (1.4 → 1 en 150 ms): confirma la elección
+        from . import motion
+        if on:
+            motion.animate(self, "pop", 1.4, 1.0, 150, motion.ease_out(), self._set_pop)
+
+    def _set_pop(self, v):
+        self._pop = float(v)
+        self.update()
 
     def sizeHint(self):
         from PySide6.QtCore import QSize
@@ -648,7 +667,8 @@ class BandButton(QAbstractButton):
         ring = QColor(current["amber"] if on else current["muted"])
         p.setPen(QPen(ring, 1.2))
         p.setBrush(QColor(current["amber"]) if on else Qt.NoBrush)
-        p.drawEllipse(QRectF(2, cy - 5, 10, 10))
+        r = 5 * (self._pop if on else 1.0)
+        p.drawEllipse(QPointF(7, cy), r, r)
         p.setPen(QColor(current["text"] if (on or self.underMouse()) else current["muted"]))
         p.setFont(label_font(10.5, weight=700 if on else 600, spacing=118))
         p.drawText(QRectF(22, 0, self.width() - 22, h), Qt.AlignVCenter | Qt.AlignLeft, self.text().upper())
@@ -710,6 +730,7 @@ class DialStrip(QWidget):
         self.setMinimumHeight(54)
         self.setMaximumHeight(54)
         self._value = None  # None = sin descarga activa (aguja apagada)
+        self._shown = 0.0   # posición dibujada de la aguja (se desliza hacia _value)
         self._busy = False
         self._phase = 0.0
         from PySide6.QtCore import QTimer
@@ -720,7 +741,16 @@ class DialStrip(QWidget):
 
     def set_value(self, v, busy=False):
         """v: 0-100 o None (sin descarga activa). busy: activa pero sin porcentaje (la aguja late)."""
+        from . import motion
+        was = self._value
         self._value = None if v is None else max(0.0, min(100.0, float(v)))
+        target = 0.0 if self._value is None else self._value
+        if was is None or self._value is None or abs(target - self._shown) < 0.05:
+            motion.stop(self, "needle")  # al encender o apagar el dial, la aguja va directo
+            self._shown = target
+        else:
+            # La aguja se desliza desde donde está (interrumpible): 250 ms ease-in-out
+            motion.animate(self, "needle", self._shown, target, 250, motion.ease_in_out(), self._set_shown)
         self._busy = bool(busy) and v is not None
         if self._busy and not self._pulse.isActive():
             self._pulse.start()
@@ -728,6 +758,10 @@ class DialStrip(QWidget):
             self._pulse.stop()
         desc = "Sin descargas activas" if v is None else ("Preparando la descarga" if self._busy else f"{self._value:.0f} %")
         self.setAccessibleDescription(desc)
+        self.update()
+
+    def _set_shown(self, v):
+        self._shown = float(v)
         self.update()
 
     def _tick(self):
@@ -763,7 +797,7 @@ class DialStrip(QWidget):
             col = QColor(current["faint"])
         else:
             import math
-            x = left + span * self._value / 100
+            x = left + span * self._shown / 100
             col = QColor(current["amber"])
             if self._busy:
                 col.setAlphaF(0.45 + 0.55 * (0.5 + 0.5 * math.sin(self._phase * 2 * math.pi)))

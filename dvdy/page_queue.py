@@ -16,6 +16,7 @@ from .errors import ACTION_LABELS, NO_RETRY
 from .tasks import CANCELED, DONE, ERROR, PAUSED, QUEUED, RUNNING
 from .theme import ICON, icon_font
 from .utils import open_path, reveal_path
+from . import motion
 from .widgets import DialStrip, icon_button, label, load_thumbnail, plural, thumb_label
 
 KIND_ICON = {"download": "download", "ffmpeg": "convert", "other": "sync"}
@@ -27,6 +28,60 @@ def _small(text, cb, primary=False):
     b.setCursor(Qt.PointingHandCursor)
     b.clicked.connect(cb)
     return b
+
+
+class _DoneMark(QWidget):
+    """Insignia de «listo» sobre la tapa: la tilde se dibuja en 300 ms (el final del recorrido, peak-end)."""
+
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.setFixedSize(22, 22)
+        self.setAttribute(Qt.WA_TransparentForMouseEvents)
+        self._t = 0.0
+        self._scale = 1.0
+
+    def play(self):
+        self.show()
+        self.raise_()
+        motion.animate(self, "scale", 0.4, 1.0, 220, motion.spring_out(), self._set_scale)
+        motion.animate(self, "draw", 0.0, 1.0, 300, motion.ease_out(), self._set_t)
+
+    def _set_scale(self, v):
+        self._scale = float(v)
+        self.update()
+
+    def _set_t(self, v):
+        self._t = float(v)
+        self.update()
+
+    def paintEvent(self, e):
+        from PySide6.QtCore import QPointF
+        from PySide6.QtGui import QColor, QPainter, QPainterPath, QPen
+        from .theme import current
+        p = QPainter(self)
+        p.setRenderHint(QPainter.Antialiasing)
+        p.translate(11, 11)
+        p.scale(self._scale, self._scale)
+        p.setPen(QPen(QColor(current["bg"]), 2))
+        p.setBrush(QColor(current["text"]))
+        p.drawEllipse(QPointF(0, 0), 9.5, 9.5)
+        path = QPainterPath(QPointF(-4.2, 0.2))
+        path.lineTo(-1.2, 3.2)
+        path.lineTo(4.4, -3.2)
+        pen = QPen(QColor(current["bg"]), 2)
+        pen.setCapStyle(Qt.RoundCap)
+        pen.setJoinStyle(Qt.RoundJoin)
+        p.setPen(pen)
+        p.setBrush(Qt.NoBrush)
+        # Dibujo progresivo del trazo: se recorta al largo animado
+        length = path.length()
+        partial = QPainterPath(path.pointAtPercent(0))
+        steps = 24
+        for i in range(1, steps + 1):
+            frac = self._t * i / steps
+            partial.lineTo(path.pointAtPercent(path.percentAtLength(length * frac)))
+        p.drawPath(partial)
+        p.end()
 
 
 class TaskRow(QWidget):
@@ -76,10 +131,16 @@ class TaskRow(QWidget):
         mid.addLayout(self.actions)
         lay.addLayout(mid, 1)
 
+        self.done_mark = _DoneMark(self.cover)
+        self.done_mark.move(56 - 22 + 4, 56 - 22 + 4)
+        self.done_mark.hide()
+        self.cover.setContentsMargins(0, 0, 0, 0)
+
         self.remove_btn = icon_button("cancel", "Quitar de la lista", lambda: manager.remove(task))
         self.remove_btn.setAccessibleName("Quitar de la lista")
         lay.addWidget(self.remove_btn, 0, Qt.AlignTop)
         self._last_state = None
+        self._prev_status = task.status
         self.refresh()
 
     # --- acciones ---
@@ -179,6 +240,16 @@ class TaskRow(QWidget):
             self._set_actions(items)
         self.remove_btn.setVisible(t.status != RUNNING)
 
+        # Momentos de cierre: tilde que se dibuja al terminar, sacudón breve si falla
+        if t.status != self._prev_status:
+            if t.status == DONE:
+                self.done_mark.play()
+            elif t.status == ERROR:
+                motion.shake(self.status)
+            if t.status != DONE:
+                self.done_mark.hide()
+            self._prev_status = t.status
+
     def _set_title(self):
         title = self.task.title or ""
         if title.startswith(("http://", "https://")):
@@ -255,6 +326,7 @@ class DialPanel(QFrame):
         r = TaskRow(task, self.manager, self.on_action)
         self.rows[task.id] = r
         self.list_lay.insertWidget(0, r)
+        motion.fade(r, 0.0, 1.0, motion.ENTER, motion.ease_out())  # entra suave al dial
         self._refresh_head()
 
     def _updated(self, task):
@@ -266,8 +338,10 @@ class DialPanel(QFrame):
     def _removed(self, task):
         r = self.rows.pop(task.id, None)
         if r:
-            r.setParent(None)
-            r.deleteLater()
+            def gone(r=r):
+                r.setParent(None)
+                r.deleteLater()
+            motion.fade(r, 1.0, 0.0, motion.EXIT, motion.ease_in(), on_done=gone)  # sale más rápido de lo que entró
         self._refresh_head()
 
     def _refresh_head(self):

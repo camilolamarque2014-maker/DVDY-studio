@@ -30,6 +30,13 @@ class _Signals(QObject):
 
 
 class UpdateDialog(QDialog):
+    def showEvent(self, e):
+        super().showEvent(e)
+        if not getattr(self, "_shown_once", False):
+            self._shown_once = True
+            from . import motion
+            motion.window_in(self, motion.UI)  # aparece con un fundido de 200 ms
+
     def __init__(self, info, manager=None, parent=None):
         super().__init__(parent)
         self.info = info

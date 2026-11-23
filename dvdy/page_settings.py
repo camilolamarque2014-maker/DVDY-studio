@@ -27,6 +27,7 @@ def _versions():
 class SettingsPage(Page):
     theme_changed = Signal()
     components_requested = Signal()
+    tutorial_requested = Signal()
 
     def __init__(self, manager):
         super().__init__("Ajustes", "Los cambios se guardan solos.")
@@ -99,6 +100,11 @@ class SettingsPage(Page):
         lay.addWidget(self.clip)
         lay.addWidget(self.notify)
         lay.addWidget(self.updates)
+        self.anims = QCheckBox("Animaciones suaves en la interfaz")
+        self.anims.setChecked(cfg["animations"])
+        self.anims.setToolTip("Si en Windows están desactivadas las animaciones, la app tampoco las usa.")
+        lay.addWidget(self.anims)
+        lay.addWidget(row(button("Ver el tutorial de nuevo", lambda: self.tutorial_requested.emit()), None))
         self.add(c)
 
         # ---- Nombres (Avanzado) ----
@@ -174,7 +180,7 @@ class SettingsPage(Page):
         for w in (self.def_quality, self.def_container, self.def_afmt, self.def_aq, self.browser):
             w.currentIndexChanged.connect(self._changed)
         for w in (self.embed_meta, self.embed_thumb, self.use_archive, self.clip, self.notify, self.updates,
-                  self.restrict, self.geo):
+                  self.anims, self.restrict, self.geo):
             w.toggled.connect(self._changed)
         for w in (self.max_conc, self.frags, self.retries):
             w.valueChanged.connect(self._changed)
@@ -249,6 +255,7 @@ class SettingsPage(Page):
         if self.updates.isChecked() and not cfg["check_updates"]:
             cfg["skip_update_version"] = ""  # al reactivar, volver a avisar de todo
         cfg["check_updates"] = self.updates.isChecked()
+        cfg["animations"] = self.anims.isChecked()
         cfg.save()
         self.manager.schedule()
         self.saved_lbl.setText("Guardado")

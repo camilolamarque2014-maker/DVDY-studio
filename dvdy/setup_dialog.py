@@ -33,6 +33,13 @@ def component_state(key):
 
 
 class SetupDialog(QDialog):
+    def showEvent(self, e):
+        super().showEvent(e)
+        if not getattr(self, "_shown_once", False):
+            self._shown_once = True
+            from . import motion
+            motion.window_in(self, motion.UI)  # aparece con un fundido de 200 ms
+
     """components: claves a ofrecer. preselect: las que vienen marcadas."""
 
     def __init__(self, parent=None, components=("ffmpeg", "deno"), preselect=None, intro=None):

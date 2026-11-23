@@ -126,6 +126,7 @@ class MainWindow(QMainWindow):
         self.pages["search"].open_download.connect(lambda u: (self.go("download"), self.pages["download"].set_url(u)))
         self.pages["settings"].theme_changed.connect(self.apply_theme)
         self.pages["settings"].components_requested.connect(lambda *_: self.open_components())
+        self.pages["settings"].tutorial_requested.connect(lambda *_: self.show_tutorial())
         self.manager.log.connect(self.pages["log"].append)
         self.manager.counts_changed.connect(self._counts)
         self.manager.task_finished.connect(self._finished)
@@ -155,8 +156,8 @@ class MainWindow(QMainWindow):
         self._paint_wordmark()
         self._counts(0, 0)
         QTimer.singleShot(0, lambda: self.pages["download"].urls.setFocus())
-        QTimer.singleShot(500, self.check_components)
-        QTimer.singleShot(1500, self.check_updates)
+        # Al abrir, una ventana por vez: componentes → tutorial (la primera vez) → aviso de versión nueva
+        QTimer.singleShot(500, self._startup)
 
     # ------------------------------------------------------------------
     def _paint_wordmark(self):
@@ -212,7 +213,12 @@ class MainWindow(QMainWindow):
         self.nav[key].setChecked(True)
         if isinstance(QApplication.focusWidget(), NavButton):
             self.nav[key].setFocus(Qt.OtherFocusReason)
-        self.stack.setCurrentWidget(self.pages[key])
+        page = self.pages[key]
+        if self.stack.currentWidget() is not page:
+            self.stack.setCurrentWidget(page)
+            # Se cambia de sección muy seguido: solo un fundido corto, sin desplazamiento
+            from . import motion
+            motion.fade(page, 0.0, 1.0, 150, motion.ease_out())
         if key == "history":
             self.pages["history"].refresh()
 
@@ -285,6 +291,16 @@ class MainWindow(QMainWindow):
             cfg.save()
             self.tray.showMessage("Faltan componentes", "Puedes instalarlos cuando quieras desde Ajustes.",
                                   QSystemTrayIcon.Warning, 5000)
+
+    def _startup(self):
+        self.check_components()  # modal: espera a que se cierre
+        if not cfg["tutorial_done"]:
+            self.show_tutorial()
+        self.check_updates()     # consulta en segundo plano; su ventana sale después
+
+    def show_tutorial(self):
+        from .tutorial import TutorialDialog
+        TutorialDialog(self).exec()
 
     def check_updates(self):
         """Consulta en segundo plano si hay una versión nueva publicada en GitHub."""

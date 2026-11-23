@@ -5,7 +5,7 @@ import threading
 import time
 
 APP_NAME = "DVDY Studio"
-APP_VERSION = "2.2.0"
+APP_VERSION = "2.3.0"
 
 CONFIG_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "DVDY Studio")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
@@ -46,6 +46,8 @@ DEFAULTS = {
     "window_geometry": None,
     "ui_mode": "advanced",
     "skip_component_check": "",
+    "animations": True,             # además se respeta «Mostrar animaciones en Windows»
+    "tutorial_done": False,         # el tutorial se muestra una sola vez (se puede volver a ver en Ajustes)
     "check_updates": True,          # avisar cuando hay una versión nueva en GitHub
     "skip_update_version": "",      # versión que el usuario eligió saltar (ej. "v2.2.0")
 }
