@@ -5,7 +5,7 @@ Solo video y Formato manual) y cuatro casillas: Calidad, Formato, Carpeta y Subt
 Debajo, «Más opciones» despliega todo lo demás. El botón indica cuántas opciones extra están
 activas, para que nada oculto se aplique sin que se vea.
 """
-from PySide6.QtCore import Signal
+from PySide6.QtCore import Qt, Signal
 from PySide6.QtWidgets import (
     QCheckBox, QComboBox, QGridLayout, QHBoxLayout, QLineEdit, QPushButton, QTabWidget, QVBoxLayout, QWidget,
 )
@@ -97,11 +97,17 @@ class OptionsPanel(QWidget):
         outer.addWidget(row(self.more_btn, None))
 
         self.tabs = QTabWidget()
-        outer.addWidget(self.tabs)
+        # Marco que recorta las pestañas al abrir y cerrar: se anima su alto, no el de las pestañas,
+        # así el contenido nunca se reacomoda a mitad de camino (antes los controles cambiaban de ancho)
+        self.more_wrap = QWidget()
+        wl = QVBoxLayout(self.more_wrap)
+        wl.setContentsMargins(0, 0, 0, 0)
+        wl.addWidget(self.tabs, 0, Qt.AlignTop)
+        outer.addWidget(self.more_wrap)
         self._build_tabs()
         self.tabs.currentChanged.connect(self._fit_tabs)
         self._fit_tabs()
-        self.tabs.hide()
+        self.more_wrap.hide()
         # La vista previa y el pie con Descargar van después de las opciones que configuran
         outer.addLayout(self.action_slot, 1)
 
@@ -265,28 +271,36 @@ class OptionsPanel(QWidget):
         """Abre en 220 ms (ease-out) y cierra en 120 ms (ease-in): cerrar siempre es más rápido."""
         from . import motion
         self._update_more_label()
-        start = self.tabs.height() if self.tabs.isVisible() else 0
+        wrap = self.more_wrap
+        start = wrap.height() if wrap.isVisible() else 0
+
+        def release():
+            wrap.setMinimumHeight(0)
+            wrap.setMaximumHeight(16777215)
         if on:
-            self.tabs.setVisible(True)
             self._fit_tabs()
-            target = self.tabs.height()
+            target = self.tabs.maximumHeight()  # _fit_tabs fija el alto de las pestañas
             if not motion.enabled():
+                release()
+                wrap.setVisible(True)
                 return
-            self.tabs.setFixedHeight(start)
-            motion.fade(self.tabs, 0.0, 1.0, motion.ENTER, motion.ease_out())
+            wrap.setFixedHeight(start)
+            wrap.setVisible(True)
+            motion.fade(wrap, 0.0, 1.0, motion.ENTER, motion.ease_out())
             motion.animate(self, "more", start, target, 220, motion.ease_out(),
-                           lambda v: self.tabs.setFixedHeight(int(v)), self._fit_tabs)
+                           lambda v: wrap.setFixedHeight(int(v)), release)
         else:
             def done():
-                self.tabs.setVisible(False)
-                self.tabs.setGraphicsEffect(None)
-                self._fit_tabs()
+                wrap.setVisible(False)
+                wrap.setGraphicsEffect(None)
+                release()
             if not motion.enabled():
                 done()
                 return
-            motion.fade(self.tabs, 1.0, 0.0, motion.EXIT, motion.ease_in())
+            wrap.setFixedHeight(start)
+            motion.fade(wrap, 1.0, 0.0, motion.EXIT, motion.ease_in())
             motion.animate(self, "more", start, 0, motion.EXIT, motion.ease_in(),
-                           lambda v: self.tabs.setFixedHeight(int(v)), done)
+                           lambda v: wrap.setFixedHeight(int(v)), done)
 
     def _active_extras(self):
         """Opciones de «Más opciones» que difieren de lo predeterminado."""

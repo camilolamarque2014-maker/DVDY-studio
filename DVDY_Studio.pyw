@@ -108,6 +108,9 @@ def main():
     from dvdy.theme import apply_palette
     apply_palette(app, resolve_theme(cfg["theme"]))
     app.setStyleSheet(build_qss(resolve_theme(cfg["theme"])))
+    from dvdy.widgets import NoWheelOnControls
+    app._no_wheel = NoWheelOnControls(app)
+    app.installEventFilter(app._no_wheel)  # la rueda desplaza la página, no cambia opciones
     if "--selftest" in sys.argv:
         return _selftest(sys.argv[sys.argv.index("--selftest") + 1])
     win = MainWindow()

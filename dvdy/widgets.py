@@ -872,3 +872,27 @@ class _TileFocus(QObject):
                 self.frame.style().unpolish(self.frame)
                 self.frame.style().polish(self.frame)
         return False
+
+
+# ---------------------------------------------------------------------------
+class NoWheelOnControls(QObject):
+    """La rueda del mouse no cambia listas desplegables, números ni deslizadores: sigue desplazando la página.
+
+    Así, al recorrer las opciones con la rueda, no se cambia un valor sin querer al pasar por encima.
+    Las listas abiertas (el desplegable de un QComboBox) siguen respondiendo a la rueda con normalidad.
+    """
+
+    def eventFilter(self, obj, ev):
+        from PySide6.QtCore import QEvent
+        from PySide6.QtWidgets import QAbstractScrollArea, QAbstractSpinBox, QSlider
+        if ev.type() != QEvent.Wheel or not isinstance(obj, (QComboBox, QAbstractSpinBox, QSlider)):
+            return False
+        p = obj.parentWidget()
+        while p is not None and not isinstance(p, QAbstractScrollArea):
+            p = p.parentWidget()
+        if p is not None:
+            bar = p.horizontalScrollBar() if ev.angleDelta().x() and not ev.angleDelta().y() else p.verticalScrollBar()
+            if bar.isVisible():
+                from PySide6.QtWidgets import QApplication
+                QApplication.sendEvent(bar, ev)
+        return True  # el control no recibe la rueda
