@@ -9,7 +9,8 @@ from PySide6.QtCore import QTimer, Signal
 from PySide6.QtWidgets import QCheckBox, QGridLayout, QLineEdit, QMessageBox, QSpinBox
 
 from .config import ARCHIVE_FILE, CONFIG_DIR, cfg
-from .utils import ffmpeg_version, find_ffmpeg, find_js_runtime
+from .system import IS_WINDOWS
+from .utils import ffmpeg_version, find_ffmpeg, find_js_runtime, open_path
 from .widgets import Page, PathPicker, Segmented, button, card, combo, field, label, row, run_async
 from .ytopts import AUDIO_FORMATS, AUDIO_QUALITIES, CONTAINERS, VIDEO_QUALITIES
 
@@ -48,7 +49,8 @@ class SettingsPage(Page):
                           button("Comprobar de nuevo", self.check, flat=True), None))
         lay.addWidget(label("Si YouTube cambia algo y las descargas empiezan a fallar, actualizar yt-dlp suele solucionarlo.",
                             "Hint", wrap=True))
-        self.ffmpeg_path = PathPicker("open", cfg["ffmpeg_path"], "ffmpeg.exe (ffmpeg.exe);;Todos (*)",
+        ff_filter = "ffmpeg.exe (ffmpeg.exe);;Todos (*)" if IS_WINDOWS else "ffmpeg (ffmpeg);;Todos (*)"
+        self.ffmpeg_path = PathPicker("open", cfg["ffmpeg_path"], ff_filter,
                                       "Vacío = usar el FFmpeg instalado por la app o el del sistema")
         f = field("Ruta de FFmpeg (opcional)", self.ffmpeg_path)
         lay.addWidget(f)
@@ -89,7 +91,7 @@ class SettingsPage(Page):
 
         # ---- Interfaz ----
         c, lay = card("Apariencia y avisos")
-        self.theme = Segmented([("Como Windows", "auto"), ("Oscuro", "dark"), ("Claro", "light")], cfg["theme"])
+        self.theme = Segmented([("Como el sistema", "auto"), ("Oscuro", "dark"), ("Claro", "light")], cfg["theme"])
         lay.addWidget(field("Tema", self.theme))
         self.clip = QCheckBox("Ofrecer descargar los enlaces que copio")
         self.clip.setChecked(cfg["clipboard_monitor"])
@@ -102,7 +104,7 @@ class SettingsPage(Page):
         lay.addWidget(self.updates)
         self.anims = QCheckBox("Animaciones suaves en la interfaz")
         self.anims.setChecked(cfg["animations"])
-        self.anims.setToolTip("Si en Windows están desactivadas las animaciones, la app tampoco las usa.")
+        self.anims.setToolTip("Si el sistema tiene desactivadas las animaciones, la app tampoco las usa.")
         lay.addWidget(self.anims)
         lay.addWidget(row(button("Ver el tutorial de nuevo", lambda: self.tutorial_requested.emit()), None))
         self.add(c)
@@ -163,7 +165,7 @@ class SettingsPage(Page):
         self.adv.append(c)
 
         cfg_btn = button("Abrir la carpeta de configuración",
-                         lambda: os.startfile(CONFIG_DIR) if os.path.isdir(CONFIG_DIR) else None, flat=True)
+                         lambda: open_path(CONFIG_DIR), flat=True)
         self.add(row(cfg_btn, None))
         self.adv.append(cfg_btn)
         self.body.addStretch(1)

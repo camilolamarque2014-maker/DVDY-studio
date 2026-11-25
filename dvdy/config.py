@@ -4,23 +4,20 @@ import os
 import threading
 import time
 
-APP_NAME = "DVDY Studio"
-APP_VERSION = "2.3.2"
+from .system import config_dir, user_dir
 
-CONFIG_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "DVDY Studio")
+APP_NAME = "DVDY Studio"
+APP_VERSION = "2.4.0"
+
+CONFIG_DIR = config_dir()  # Windows: %APPDATA%\DVDY Studio · Linux: ~/.config/dvdy-studio
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
 HISTORY_FILE = os.path.join(CONFIG_DIR, "history.json")
 ARCHIVE_FILE = os.path.join(CONFIG_DIR, "download_archive.txt")
 
 
-def _default_dir(name):
-    path = os.path.join(os.path.expanduser("~"), name)
-    return path if os.path.isdir(path) else os.path.expanduser("~")
-
-
 DEFAULTS = {
-    "output_dir": _default_dir("Downloads"),
-    "music_dir": _default_dir("Music"),
+    "output_dir": user_dir("download"),
+    "music_dir": user_dir("music"),
     "filename_template": "%(title)s.%(ext)s",
     "playlist_template": "%(playlist_title)s/%(playlist_index)02d - %(title)s.%(ext)s",
     "max_concurrent": 2,
@@ -42,11 +39,11 @@ DEFAULTS = {
     "use_archive": False,
     "clipboard_monitor": False,
     "notify_on_finish": True,
-    "theme": "auto",  # auto = sigue a Windows; también "dark" o "light"
+    "theme": "auto",  # auto = sigue al sistema; también "dark" o "light"
     "window_geometry": None,
     "ui_mode": "advanced",
     "skip_component_check": "",
-    "animations": True,             # además se respeta «Mostrar animaciones en Windows»
+    "animations": True,             # además se respeta la opción del sistema
     "tutorial_done": False,         # el tutorial se muestra una sola vez (se puede volver a ver en Ajustes)
     "check_updates": True,          # avisar cuando hay una versión nueva en GitHub
     "skip_update_version": "",      # versión que el usuario eligió saltar (ej. "v2.2.0")

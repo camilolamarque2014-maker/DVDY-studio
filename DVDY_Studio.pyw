@@ -1,8 +1,10 @@
 """DVDY Studio — interfaz gráfica para yt-dlp y FFmpeg.
 
 Se puede ejecutar de dos formas:
-  * Como programa (DVDY Studio.exe), generado con build.py: no necesita Python.
-  * Desde el código: doble clic en este archivo. Si faltan librerías de Python, ofrece instalarlas.
+  * Como programa, generado con build.py: no necesita Python.
+      Windows: DVDY Studio.exe (zip) · Ubuntu: paquete .deb (comando dvdy-studio)
+  * Desde el código: doble clic en este archivo (Windows) o «python3 DVDY_Studio.pyw» (Linux).
+    En Windows, si faltan librerías de Python, ofrece instalarlas; en Linux explica cómo.
 
 FFmpeg y Deno se descargan desde la propia app si no están en el equipo.
 """
@@ -24,11 +26,6 @@ if sys.stderr is None:
 PY_PACKAGES = [("PySide6", "PySide6"), ("yt_dlp", "yt-dlp[default]"), ("mutagen", "mutagen")]
 
 
-def _msgbox(text, title="DVDY Studio", flags=0x40):
-    import ctypes
-    return ctypes.windll.user32.MessageBoxW(0, text, title, flags)
-
-
 def _ensure_python_packages():
     """Solo al ejecutar desde el código: instala con pip las librerías que falten."""
     missing = []
@@ -39,10 +36,20 @@ def _ensure_python_packages():
             missing.append(pkg)
     if not missing:
         return True
-    ans = _msgbox("Faltan estas librerías de Python:\n\n    " + "\n    ".join(missing) +
+    from dvdy.system import IS_WINDOWS, show_error_box
+    if not IS_WINDOWS:
+        # Ubuntu no deja instalar con pip fuera de un entorno virtual (PEP 668): explicar cómo hacerlo
+        show_error_box("Faltan estas librerías de Python: " + ", ".join(missing) + "\n\n"
+                       "Instálalas en un entorno virtual, desde la carpeta del programa:\n\n"
+                       "  sudo apt install python3-venv\n"
+                       "  python3 -m venv .venv\n"
+                       "  .venv/bin/pip install -r requirements.txt\n"
+                       "  .venv/bin/python DVDY_Studio.pyw")
+        return False
+    ans = show_error_box("Faltan estas librerías de Python:\n\n    " + "\n    ".join(missing) +
                   "\n\n¿Quieres instalarlas automáticamente ahora? (necesita Internet, tarda uno o dos minutos)",
-                  flags=0x24)  # Sí / No + icono de pregunta
-    if ans != 6:  # IDYES
+                  question=True)
+    if not ans:
         return False
     exe = sys.executable
     if exe.lower().endswith("pythonw.exe"):
@@ -51,8 +58,8 @@ def _ensure_python_packages():
     code = subprocess.call([exe, "-m", "pip", "install", "--upgrade", *missing],
                            creationflags=getattr(subprocess, "CREATE_NEW_CONSOLE", 0))
     if code != 0:
-        _msgbox("No se pudieron instalar las librerías. Prueba manualmente con:\n\npip install " +
-                " ".join(f'"{m}"' for m in missing), flags=0x10)
+        show_error_box("No se pudieron instalar las librerías. Prueba manualmente con:\n\npip install " +
+                       " ".join(f'"{m}"' for m in missing))
         return False
     import importlib
     importlib.invalidate_caches()
@@ -80,6 +87,10 @@ def main():
         return
     sys.excepthook = _excepthook
 
+    # Linux + .deb: que ffmpeg, xdg-open o pkexec no hereden las librerías empaquetadas
+    from dvdy.system import IS_WINDOWS, fix_frozen_environment
+    fix_frozen_environment()
+
     # Python 3.15: resolver los «lazy imports» antes de crear hilos de descarga
     from dvdy.compat import resolve_lazy_imports
     resolve_lazy_imports()
@@ -88,7 +99,7 @@ def main():
     from dvdy.deps import activate_ytdlp_override
     activate_ytdlp_override()
 
-    if os.name == "nt":
+    if IS_WINDOWS:
         import ctypes
         try:
             ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID("dvdy.studio.2")
@@ -102,6 +113,10 @@ def main():
 
     app = QApplication(sys.argv)
     app.setApplicationName(APP_NAME)
+    if not IS_WINDOWS:
+        # Wayland identifica la ventana por el .desktop: así GNOME muestra el ícono correcto
+        from dvdy.system import APP_ID
+        app.setDesktopFileName(APP_ID)
     app.setStyle("Fusion")
     from dvdy.theme import load_fonts, resolve_theme
     load_fonts()

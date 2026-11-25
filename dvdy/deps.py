@@ -1,28 +1,49 @@
 """Gestor de componentes externos: descarga e instala FFmpeg, Deno y versiones nuevas de yt-dlp.
 
-Todo se guarda en %LOCALAPPDATA%\\DVDY Studio\\bin, así no hace falta permisos de administrador
-ni tocar el PATH del sistema. Las descargas salen de las releases oficiales en GitHub.
+Todo se guarda en una carpeta del usuario, así no hace falta permisos de administrador ni
+tocar el PATH del sistema:
+  Windows: %LOCALAPPDATA%\\DVDY Studio\\bin
+  Linux:   ~/.local/share/dvdy-studio/bin
+Las descargas salen de las releases oficiales en GitHub.
 """
 import os
+import platform
 import shutil
+import stat
 import sys
+import tarfile
 import tempfile
 import urllib.request
 import zipfile
 
-BIN_DIR = os.environ.get("DVDY_BIN_DIR") or os.path.join(
-    os.environ.get("LOCALAPPDATA") or os.path.expanduser("~"), "DVDY Studio", "bin")
+from .system import EXE_SUFFIX, IS_WINDOWS, data_dir
+
+BIN_DIR = os.environ.get("DVDY_BIN_DIR") or os.path.join(data_dir(), "bin")
 YTDLP_ZIP = os.path.join(BIN_DIR, "yt-dlp.zip")
 
 FROZEN = bool(getattr(sys, "frozen", False))
 
-URLS = {
-    # Compilación de FFmpeg mantenida por el equipo de yt-dlp (incluye ffmpeg.exe y ffprobe.exe)
-    "ffmpeg": "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-win64-gpl.zip",
-    "deno": "https://github.com/denoland/deno/releases/latest/download/deno-x86_64-pc-windows-msvc.zip",
-    # Versión «zipimport» oficial de yt-dlp (Python puro): se carga sin reinstalar el programa
-    "yt-dlp": "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp",
-}
+_FFMPEG = "https://github.com/yt-dlp/FFmpeg-Builds/releases/download/latest/ffmpeg-master-latest-{}-gpl.{}"
+_DENO = "https://github.com/denoland/deno/releases/latest/download/deno-{}.zip"
+
+
+def _urls():
+    """Paquetes para este sistema. FFmpeg: compilación mantenida por el equipo de yt-dlp."""
+    if IS_WINDOWS:
+        ffmpeg, deno = _FFMPEG.format("win64", "zip"), _DENO.format("x86_64-pc-windows-msvc")
+    elif platform.machine().lower() in ("aarch64", "arm64"):
+        ffmpeg, deno = _FFMPEG.format("linuxarm64", "tar.xz"), _DENO.format("aarch64-unknown-linux-gnu")
+    else:
+        ffmpeg, deno = _FFMPEG.format("linux64", "tar.xz"), _DENO.format("x86_64-unknown-linux-gnu")
+    return {
+        "ffmpeg": ffmpeg,
+        "deno": deno,
+        # Versión «zipimport» oficial de yt-dlp (Python puro): se carga sin reinstalar el programa
+        "yt-dlp": "https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp",
+    }
+
+
+URLS = _urls()
 
 COMPONENTS = {
     "ffmpeg": {
@@ -51,7 +72,7 @@ class Cancelled(Exception):
 
 
 def bin_path(name):
-    return os.path.join(BIN_DIR, name + (".exe" if os.name == "nt" else ""))
+    return os.path.join(BIN_DIR, name + EXE_SUFFIX)
 
 
 def local_ffmpeg():
@@ -127,21 +148,37 @@ def download(url, dest, progress=None, cancel=None):
         raise IOError("La descarga quedó incompleta. Revisa tu conexión e inténtalo de nuevo.")
 
 
-def _extract(zip_path, wanted):
-    """Extrae del zip los archivos cuyo nombre base esté en `wanted` hacia BIN_DIR."""
+def _members(archive):
+    """(nombre, abrir) de cada archivo del paquete, sea .zip o .tar.xz."""
+    if zipfile.is_zipfile(archive):
+        with zipfile.ZipFile(archive) as z:
+            for info in z.infolist():
+                if not info.is_dir():
+                    yield info.filename, (lambda info=info: z.open(info))
+    else:
+        with tarfile.open(archive) as t:
+            for m in t.getmembers():
+                if m.isfile():
+                    yield m.name, (lambda m=m: t.extractfile(m))
+
+
+def _extract(archive, names):
+    """Extrae del paquete los programas `names` (sin .exe) hacia BIN_DIR."""
+    wanted = {n + EXE_SUFFIX for n in names}
     os.makedirs(BIN_DIR, exist_ok=True)
     found = set()
-    with zipfile.ZipFile(zip_path) as z:
-        for info in z.infolist():
-            base = os.path.basename(info.filename).lower()
-            if base in wanted and not info.is_dir():
-                target = os.path.join(BIN_DIR, base)
-                tmp = target + ".new"
-                with z.open(info) as src, open(tmp, "wb") as dst:
-                    shutil.copyfileobj(src, dst)
-                os.replace(tmp, target)
-                found.add(base)
-    missing = set(wanted) - found
+    for name, opener in _members(archive):
+        base = os.path.basename(name).lower()
+        if base in wanted:
+            target = os.path.join(BIN_DIR, base)
+            tmp = target + ".new"
+            with opener() as src, open(tmp, "wb") as dst:
+                shutil.copyfileobj(src, dst)
+            if not IS_WINDOWS:
+                os.chmod(tmp, os.stat(tmp).st_mode | stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)
+            os.replace(tmp, target)
+            found.add(base)
+    missing = wanted - found
     if missing:
         raise RuntimeError("El paquete descargado no contiene: " + ", ".join(sorted(missing)))
 
@@ -159,12 +196,12 @@ def install(component, progress=None, status=None, cancel=None):
         download(url, tmp, progress, cancel)
         if component == "ffmpeg":
             status("Descomprimiendo FFmpeg…")
-            _extract(tmp, {"ffmpeg.exe", "ffprobe.exe"})
+            _extract(tmp, ("ffmpeg", "ffprobe"))
             from . import utils
             utils._encoders_cache = None
         elif component == "deno":
             status("Descomprimiendo Deno…")
-            _extract(tmp, {"deno.exe"})
+            _extract(tmp, ("deno",))
         elif component == "yt-dlp":
             status("Verificando yt-dlp…")
             with zipfile.ZipFile(tmp) as z:

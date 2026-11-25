@@ -6,7 +6,7 @@
 
 desktop
 
-Native Windows desktop app (Windows 10/11, 64-bit) built with Python and PySide6 (Qt Widgets). Not a web app: there is no browser surface, URL, or dev server.
+Native desktop app for Windows 10/11 and Ubuntu 22.04+ (64-bit) built with Python and PySide6 (Qt Widgets). Not a web app: there is no browser surface, URL, or dev server. Windows was the original target; the Ubuntu port landed in v2.4.0. Platform differences live in `dvdy/system.py`.
 
 ## Users
 
@@ -27,7 +27,8 @@ Success means a non-technical person can install it, get a working download on t
 
 ## Operating Context
 
-- Distributed as a zip on GitHub Releases (`DVDY_Studio-vX.Y.Z-windows-x64.zip`) containing `DVDY Studio.exe` plus its `_internal` folder; users unzip and run it. No installer, no admin rights.
+- Ubuntu: distributed as `dvdy-studio_X.Y.Z_amd64.deb` on the same release. It installs to `/opt/dvdy-studio`, adds `/usr/bin/dvdy-studio`, a `.desktop` entry and hicolor icons, depends on the Qt X11/Wayland system libraries and recommends `ffmpeg`. Self-update downloads the new `.deb` into a private folder in `/tmp`, closes the app and runs `pkexec apt install -y --reinstall`, then relaunches as the user. Config in `~/.config/dvdy-studio`, components in `~/.local/share/dvdy-studio/bin`; default folders follow XDG user dirs (e.g. `~/Descargas`, `~/Música`).
+- Windows: distributed as a zip on GitHub Releases (`DVDY_Studio-vX.Y.Z-windows-x64.zip`) containing `DVDY Studio.exe` plus its `_internal` folder; users unzip and run it. No installer, no admin rights.
 - On first launch, if FFmpeg or Deno are missing, the app offers to download them automatically from their official GitHub releases into `%LOCALAPPDATA%\DVDY Studio\bin`. yt-dlp ships inside the exe and can be updated from Settings.
 - Unsigned executable: Windows SmartScreen warns on first run ("More info → Run anyway").
 - Settings and history live in `%APPDATA%\DVDY Studio`.
@@ -51,14 +52,14 @@ Sections (sidebar): Descargar, Playlists y música, Buscar, Cola, Convertir, Her
 
 ## Brand Commitments
 
-- Name: **DVDY Studio**. Current version 2.3.2 (the original single-file script was v1).
+- Name: **DVDY Studio**. Current version 2.4.0 (the original single-file script was v1).
 - Voice: Spanish addressed with **"tú"** (neutral Spanish: "Pega", "Elige", "Descarga"), plain and friendly, no jargon in the primary flow. Technical terms (codecs, CRF, LUFS) appear only in Advanced surfaces and always with a plain explanation.
 - GitHub description: "Interfaz gráfica para yt-dlp y FFmpeg: descarga videos, música y playlists de YouTube y +1800 sitios en la calidad que elijas, con metadatos y carátulas. Convierte y edita audio y video (MP4→MP3, recortar, comprimir, GIF). Modo simple/avanzado, cola de descargas e instalación automática de FFmpeg. Ejecutable para Windows, sin Python."
 
 ## Evidence on Hand
 
 - Repository: https://github.com/camilolamarque2014-maker/DVDY-studio
-- Releases: v2.0.0 through v2.3.2 (latest) on GitHub Releases, built on Windows by GitHub Actions (`.github/workflows/release.yml`).
+- Releases: v2.0.0 through v2.3.2 on GitHub Releases (v2.4.0 adds Ubuntu), built on Windows and Ubuntu 22.04 by GitHub Actions (`.github/workflows/release.yml`).
 - `README.md` documents installation, features, building, and credits (yt-dlp, FFmpeg, Deno, Qt/PySide6).
 - No user counts, testimonials, reviews, press, or download statistics exist. Do not fabricate any.
 

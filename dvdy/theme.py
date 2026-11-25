@@ -3,7 +3,7 @@
 Grafito oscuro, texto marfil y una sola luz ámbar reservada para lo que está activo
 (la descarga en curso, la aguja del dial, la banda elegida). El color vive solo en las
 tapas y en esa luz. Existe una versión clara de la misma identidad, que se usa cuando
-Windows está en modo claro (o si el usuario la elige en Ajustes).
+el sistema (Windows o Ubuntu) está en modo claro (o si el usuario la elige en Ajustes).
 """
 import os
 
@@ -48,6 +48,15 @@ ICON = {
     "playlist": "", "sync": "",
 }
 
+# Linux no trae las fuentes de íconos de Windows (Segoe): se usan símbolos Unicode que están en
+# las fuentes comunes (DejaVu, Noto). Solo hacen falta los íconos que la interfaz muestra.
+UNICODE_ICON = {
+    "cancel": "✕", "more": "⋯", "up": "↑", "down": "↓", "download": "↓", "convert": "⇄",
+    "sync": "⟳", "file": "▢", "music": "♪", "video": "▶", "play": "▶", "pause": "⏸",
+    "check": "✓", "add": "+", "clear": "✕", "delete": "✕", "chevdown": "⌄", "chevup": "⌃",
+    "warning": "⚠", "refresh": "⟳", "search": "⌕", "folder": "▤", "settings": "⚙",
+}
+
 _icon_family = None
 _fonts_loaded = False
 
@@ -69,7 +78,16 @@ def icon_family():
     global _icon_family
     if _icon_family is None:
         fams = set(QFontDatabase.families())
-        _icon_family = next((f for f in ("Segoe Fluent Icons", "Segoe MDL2 Assets") if f in fams), "Segoe UI Symbol")
+        segoe = next((f for f in ("Segoe Fluent Icons", "Segoe MDL2 Assets") if f in fams), None)
+        if segoe:
+            _icon_family = segoe
+        elif "Segoe UI Symbol" in fams:
+            _icon_family = "Segoe UI Symbol"
+        else:
+            # Sin fuentes de Windows: símbolos Unicode con una fuente que los tenga
+            ICON.update(UNICODE_ICON)
+            _icon_family = next((f for f in ("DejaVu Sans", "Noto Sans Symbols 2", "Noto Sans Symbols",
+                                             "Noto Sans") if f in fams), FONT_TEXT)
     return _icon_family
 
 
@@ -89,7 +107,7 @@ def label_font(size=SIZE_SMALL, weight=QFont.DemiBold, spacing=116):
 
 
 def resolve_theme(choice):
-    """'auto' sigue a Windows; 'dark' y 'light' fuerzan uno."""
+    """'auto' sigue al sistema (Windows o el modo claro/oscuro de Ubuntu); 'dark' y 'light' fuerzan uno."""
     if choice in ("dark", "light"):
         return choice
     try:

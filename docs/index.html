@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DVDY Studio · Baja música y videos sin complicarte</title>
-<meta name="description" content="Programa gratis para Windows: descarga videos, música y playlists de YouTube y +1800 sitios, con carátulas y datos, y convierte audio y video. Sin instalar Python.">
+<meta name="description" content="Programa gratis para Windows y Ubuntu: descarga videos, música y playlists de YouTube y +1800 sitios, con carátulas y datos, y convierte audio y video. Sin instalar Python.">
 <meta name="theme-color" content="#131315" media="(prefers-color-scheme: dark)">
 <meta name="theme-color" content="#ecebe7" media="(prefers-color-scheme: light)">
 <link rel="icon" href="assets/icon.svg" type="image/svg+xml">
@@ -39,7 +39,8 @@
         </a>
         <a class="btn" href="#como">Ver cómo se usa</a>
       </div>
-      <p class="hint"><span class="js-version">Versión más reciente</span> · Gratis · Windows 10 y 11 · Sin instalar Python</p>
+      <p class="hint"><span class="js-version">Versión más reciente</span> · Gratis · <span class="js-req">Windows 10 y 11</span> · Sin instalar Python</p>
+      <p class="hint js-other" hidden></p>
     </div>
 
     <!-- Demostración en vivo: el dial de la app -->
@@ -161,7 +162,7 @@
     <div class="faq" data-reveal>
       <details>
         <summary>¿Necesito instalar Python u otra cosa?</summary>
-        <p>No. Descomprimes el zip y abres <code>DVDY Studio.exe</code>. Si faltan FFmpeg o Deno, el programa te ofrece bajarlos solo.</p>
+        <p>No. En Windows descomprimes el zip y abres <code>DVDY Studio.exe</code>. En Ubuntu abres el archivo <code>.deb</code> con un doble clic y lo instalas; después aparece en tus aplicaciones. Si faltan FFmpeg o Deno, el programa te ofrece bajarlos solo.</p>
       </details>
       <details>
         <summary>Windows dice que la app es «desconocida». ¿Es seguro?</summary>
@@ -169,7 +170,7 @@
       </details>
       <details>
         <summary>¿Funciona en Mac, Linux o el celular?</summary>
-        <p>Por ahora solo en Windows 10 y 11 de 64 bits.</p>
+        <p>Funciona en Windows 10 y 11, y en Ubuntu 22.04 o posterior (también en Linux Mint, Pop!_OS y otros sistemas basados en Ubuntu), siempre de 64 bits. Por ahora no hay versión para Mac ni para el celular.</p>
       </details>
       <details>
         <summary>¿De qué sitios puedo bajar?</summary>
@@ -182,13 +183,14 @@
   <section class="download" id="descargar">
     <div class="download-inner" data-reveal>
       <h2>Bájalo y pruébalo</h2>
-      <p class="lead">Un zip de unos 60 MB. Lo descomprimes donde quieras y abres <code>DVDY Studio.exe</code>.</p>
+      <p class="lead js-howto">Un zip de unos 60 MB. Lo descomprimes donde quieras y abres <code>DVDY Studio.exe</code>.</p>
       <a class="btn btn-primary btn-big js-download" href="https://github.com/camilolamarque2014-maker/DVDY-studio/releases/latest" data-label="Descargar para Windows">
         <span class="btn-text">Descargar para Windows</span>
         <svg class="check" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>
       </a>
       <p class="hint js-version">Versión más reciente en GitHub</p>
-      <p class="hint">Requiere Windows 10 u 11 de 64 bits.</p>
+      <p class="hint js-req-long">Requiere Windows 10 u 11 de 64 bits.</p>
+      <p class="hint js-other" hidden></p>
     </div>
   </section>
 </main>

@@ -8,6 +8,8 @@ import tempfile
 TMP = tempfile.mkdtemp(prefix="dvdy_tests_")
 os.environ["APPDATA"] = TMP
 os.environ["LOCALAPPDATA"] = TMP
+os.environ["XDG_CONFIG_HOME"] = os.path.join(TMP, "config")  # Linux
+os.environ["XDG_DATA_HOME"] = os.path.join(TMP, "data")
 os.environ["DVDY_BIN_DIR"] = os.path.join(TMP, "bin")
 
 try:

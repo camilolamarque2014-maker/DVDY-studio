@@ -293,10 +293,29 @@ class MainWindow(QMainWindow):
                                   QSystemTrayIcon.Warning, 5000)
 
     def _startup(self):
+        self._report_failed_update()
         self.check_components()  # modal: espera a que se cierre
         if not cfg["tutorial_done"]:
             self.show_tutorial()
         self.check_updates()     # consulta en segundo plano; su ventana sale después
+
+    def _report_failed_update(self):
+        """Ubuntu: si el script de actualización no pudo instalar el .deb, avisar al volver a abrir."""
+        import os
+        value = os.environ.pop("DVDY_UPDATE_FAILED", "")
+        if not value:
+            return
+        from PySide6.QtWidgets import QMessageBox
+        from .updater import update_failure_message
+        text, log = update_failure_message(value)
+        box = QMessageBox(QMessageBox.Warning, "Actualización", text, QMessageBox.Ok, self)
+        if log and os.path.isfile(log):
+            try:
+                with open(log, encoding="utf-8", errors="replace") as f:
+                    box.setDetailedText(f.read()[-4000:])
+            except OSError:
+                pass
+        box.exec()
 
     def show_tutorial(self):
         from .tutorial import TutorialDialog

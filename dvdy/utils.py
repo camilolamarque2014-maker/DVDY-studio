@@ -7,6 +7,7 @@ import subprocess
 import sys
 
 from .config import cfg
+from .system import EXE_SUFFIX, open_path, reveal_path  # noqa: F401  (se reexportan)
 
 CREATE_NO_WINDOW = 0x08000000 if os.name == "nt" else 0
 
@@ -35,7 +36,7 @@ def find_ffmpeg():
     custom = (cfg["ffmpeg_path"] or "").strip()
     if custom:
         if os.path.isdir(custom):
-            cand = os.path.join(custom, "ffmpeg.exe" if os.name == "nt" else "ffmpeg")
+            cand = os.path.join(custom, "ffmpeg" + EXE_SUFFIX)
             if os.path.isfile(cand):
                 return cand
         elif os.path.isfile(custom):
@@ -48,7 +49,7 @@ def find_ffprobe():
     ff = find_ffmpeg()
     if ff:
         d = os.path.dirname(ff)
-        cand = os.path.join(d, "ffprobe.exe" if os.name == "nt" else "ffprobe")
+        cand = os.path.join(d, "ffprobe" + EXE_SUFFIX)
         if os.path.isfile(cand):
             return cand
     return shutil.which("ffprobe")
@@ -206,22 +207,6 @@ def derive_output(src, suffix, ext=None, folder=None):
     ext = ext or ext_of(src)
     folder = folder or os.path.dirname(src)
     return unique_path(os.path.join(folder, f"{base}{suffix}.{ext}"))
-
-
-def open_path(path):
-    if path and os.path.exists(path):
-        os.startfile(path)
-
-
-def reveal_path(path):
-    if not path:
-        return
-    if os.path.isfile(path):
-        subprocess.Popen(["explorer", "/select,", os.path.normpath(path)])
-    elif os.path.isdir(path):
-        os.startfile(path)
-    elif os.path.isdir(os.path.dirname(path)):
-        os.startfile(os.path.dirname(path))
 
 
 def best_thumbnail_url(info):

@@ -5,7 +5,7 @@
 - Cerrar más rápido que abrir (la salida dura la mitad o un tercio de la entrada).
 - Lo que se usa mucho apenas se anima; lo de una sola vez (el tutorial) puede lucirse más.
 - Todo se puede interrumpir: cada animación arranca desde el valor actual.
-- Si Windows tiene las animaciones desactivadas (o el usuario las apaga en Ajustes), no hay movimiento.
+- Si el sistema (Windows o GNOME) tiene las animaciones desactivadas (o el usuario las apaga en Ajustes), no hay movimiento.
 """
 import ctypes
 
@@ -51,9 +51,13 @@ _windows_motion = None
 
 
 def _windows_allows_motion():
-    """Lee «Mostrar animaciones en Windows» (SPI_GETCLIENTAREAANIMATION)."""
+    """Lee «Mostrar animaciones en Windows» (SPI_GETCLIENTAREAANIMATION) o, en Linux, la opción de GNOME."""
     global _windows_motion
     if _windows_motion is None:
+        from .system import IS_WINDOWS, gnome_animations_enabled
+        if not IS_WINDOWS:
+            _windows_motion = gnome_animations_enabled()
+            return _windows_motion
         try:
             value = ctypes.c_int(1)
             ok = ctypes.windll.user32.SystemParametersInfoW(0x1042, 0, ctypes.byref(value), 0)
@@ -179,6 +183,9 @@ def window_in(win, ms=UI):
     """Aparición de una ventana: fundido de la ventana entera."""
     if not enabled():
         return
+    from PySide6.QtGui import QGuiApplication
+    if QGuiApplication.platformName() == "wayland":
+        return  # Wayland no permite cambiar la opacidad de una ventana
     win.setWindowOpacity(0.0)
     a = QPropertyAnimation(win, b"windowOpacity", win)
     a.setStartValue(0.0)

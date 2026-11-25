@@ -144,7 +144,7 @@ class UpdateDialog(QDialog):
     # ------------------------------------------------------------------
     def _update(self):
         ok, reason = updater.can_self_update()
-        if not ok or not self.info.get("zip_url"):
+        if not ok or not self.info.get("asset_url"):
             # Sin actualización automática: abrir la página del release para bajarlo a mano
             QDesktopServices.openUrl(QUrl(self.info["url"]))
             self._say(f"{reason} Se abrió la página de descarga en el navegador." if reason else
@@ -168,7 +168,7 @@ class UpdateDialog(QDialog):
     def _work(self):
         try:
             work, new_dir = updater.download_and_prepare(
-                self.info["zip_url"],
+                self.info["asset_url"],
                 progress=lambda d, t: self.sig.progress.emit(d, t),
                 cancel=self._cancel,
                 status=lambda s: self.sig.status.emit(s))
@@ -199,7 +199,10 @@ class UpdateDialog(QDialog):
             self._say("Actualización cancelada.")
 
     def _on_ready(self, work, new_dir):
-        self._say("Listo. El programa se va a cerrar, se actualiza y se vuelve a abrir solo.")
+        from .system import IS_WINDOWS
+        self._say("Listo. El programa se va a cerrar, se actualiza y se vuelve a abrir solo." if IS_WINDOWS else
+                  "Listo. El programa se va a cerrar y Ubuntu te va a pedir tu contraseña para instalar "
+                  "la actualización. Después se vuelve a abrir solo.")
         self.bar.setValue(1000)
         QApplication.processEvents()
         updater.launch_replacer(work, new_dir, updater.install_dir(), os.getpid())

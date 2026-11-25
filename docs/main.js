@@ -6,15 +6,54 @@
   const finePointer = window.matchMedia("(pointer: fine)").matches;
 
   // ---------- Versión y enlace directo desde el último release de GitHub ----------
+  // Windows: el .zip. Linux (Ubuntu y derivados): el .deb, si el release lo trae.
+  const ua = navigator.userAgent || "";
+  const onLinux = /Linux|X11/.test(ua) && !/Android/i.test(ua);
+  const PLATFORMS = {
+    windows: { label: "Descargar para Windows", req: "Windows 10 y 11", reqLong: "Requiere Windows 10 u 11 de 64 bits.",
+               howto: "Un zip de unos {mb} MB. Lo descomprimes donde quieras y abres <code>DVDY Studio.exe</code>.",
+               other: "¿Usas Ubuntu? " },
+    ubuntu: { label: "Descargar para Ubuntu", req: "Ubuntu 22.04 o posterior", reqLong: "Requiere Ubuntu 22.04 o posterior (o un sistema basado en Ubuntu) de 64 bits.",
+              howto: "Un paquete .deb de unos {mb} MB. Ábrelo con un doble clic, instálalo y búscalo en tus aplicaciones como DVDY Studio.",
+              other: "¿Usas Windows? " },
+  };
   fetch(`https://api.github.com/repos/${REPO}/releases/latest`, { headers: { Accept: "application/vnd.github+json" } })
     .then((r) => (r.ok ? r.json() : Promise.reject(r.status)))
     .then((rel) => {
-      const zip = (rel.assets || []).find((a) => a.name.toLowerCase().endsWith(".zip"));
-      const mb = zip ? Math.round(zip.size / 1048576) : null;
+      const assets = rel.assets || [];
+      const files = {
+        windows: assets.find((a) => a.name.toLowerCase().endsWith(".zip")),
+        ubuntu: assets.find((a) => /_amd64\.deb$/i.test(a.name)),
+      };
+      const mine = onLinux && files.ubuntu ? "ubuntu" : "windows";
+      const theirs = mine === "ubuntu" ? "windows" : "ubuntu";
+      const file = files[mine];
+      const p = PLATFORMS[mine];
+      const mb = file ? Math.round(file.size / 1048576) : null;
       document.querySelectorAll(".js-version").forEach((el) => {
         el.textContent = `Versión ${rel.tag_name.replace(/^v/i, "")}` + (mb ? ` · ${mb} MB` : "");
       });
-      if (zip) document.querySelectorAll(".js-download").forEach((a) => (a.href = zip.browser_download_url));
+      if (file) {
+        document.querySelectorAll(".js-download").forEach((a) => {
+          a.href = file.browser_download_url;
+          a.dataset.label = p.label;
+          a.querySelector(".btn-text").textContent = p.label;
+        });
+      }
+      document.querySelectorAll(".js-req").forEach((el) => (el.textContent = p.req));
+      document.querySelectorAll(".js-req-long").forEach((el) => (el.textContent = p.reqLong));
+      if (mb) document.querySelectorAll(".js-howto").forEach((el) => (el.innerHTML = p.howto.replace("{mb}", mb)));
+      // Enlace a la versión del otro sistema, si existe en este release
+      if (files[theirs]) {
+        document.querySelectorAll(".js-other").forEach((el) => {
+          el.textContent = PLATFORMS[mine].other;
+          const a = document.createElement("a");
+          a.href = files[theirs].browser_download_url;
+          a.textContent = PLATFORMS[theirs].label;
+          el.appendChild(a);
+          el.hidden = false;
+        });
+      }
     })
     .catch(() => { /* sin conexión: los botones llevan a la página de releases */ });
 
