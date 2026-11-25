@@ -3,6 +3,7 @@
 - **DVDY Studio funciona en Ubuntu:** hay un paquete `.deb` para Ubuntu 22.04 o posterior y para sistemas basados en Ubuntu (Linux Mint, Pop!_OS, Zorin…). Se instala con doble clic, aparece en tus aplicaciones y trae todo lo de la versión de Windows: descargas, playlists, búsqueda, conversión y herramientas.
 - **Actualización automática también en Ubuntu:** cuando salga una versión nueva, el botón **Actualizar** del aviso la baja, cierra la app, la instala (Ubuntu te pide tu contraseña) y la vuelve a abrir.
 - En Ubuntu, la app guarda en tus carpetas **Descargas** y **Música**, sigue el modo claro u oscuro del sistema y respeta la opción de desactivar animaciones.
+- **Si usas Windows:** el programa funciona igual que antes. Esta versión prepara la app para los dos sistemas; lo único que vas a notar es que en Ajustes el tema dice «Como el sistema».
 
 ## Instalación en Windows
 1. Descarga **`DVDY_Studio-v2.4.0-windows-x64.zip`** (abajo, en *Assets*).
