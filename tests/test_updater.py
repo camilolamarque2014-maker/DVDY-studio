@@ -1,6 +1,6 @@
 import unittest
 
-from tests import _env  # noqa: F401
+from tests import _env
 from dvdy.config import APP_VERSION
 from dvdy import updater
 from dvdy.updater import brief_notes, parse_version
@@ -58,6 +58,15 @@ class LinuxUpdateTest(unittest.TestCase):
         self.assertEqual(log, "/tmp/x/actualizar.log")
         text, _ = updater.update_failure_message("100:/tmp/x/actualizar.log")
         self.assertIn("No se pudo instalar", text)
+
+    def test_mensaje_si_apt_estaba_ocupado(self):
+        import os
+        import tempfile
+        fd, log = tempfile.mkstemp(dir=_env.TMP)
+        with os.fdopen(fd, "w") as f:
+            f.write("E: No se pudo bloquear /var/lib/dpkg/lock-frontend. Está siendo usado por aptd")
+        text, _ = updater.update_failure_message(f"100:{log}")
+        self.assertIn("otras actualizaciones", text)
 
 
 if __name__ == "__main__":

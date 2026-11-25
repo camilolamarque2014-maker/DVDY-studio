@@ -237,7 +237,7 @@ def _launch_deb_installer(work_dir, deb_path, wait_pid):
     script = f"""#!/bin/sh
 # Instala la versión nueva de DVDY Studio y la vuelve a abrir.
 while kill -0 {int(wait_pid)} 2>/dev/null; do sleep 0.5; done
-pkexec /usr/bin/apt install -y --reinstall -o DPkg::Lock::Timeout=120 {q(deb_path)} > {q(log)} 2>&1
+pkexec /usr/bin/apt install -y --reinstall -o DPkg::Lock::Timeout=600 {q(deb_path)} > {q(log)} 2>&1
 code=$?
 if [ "$code" -eq 0 ]; then
     rm -f {q(deb_path)}
@@ -259,5 +259,17 @@ def update_failure_message(value):
     if code in ("126", "127"):
         return ("No se instaló la actualización porque no se ingresó la contraseña. "
                 "Puedes intentarlo de nuevo desde el aviso de versión nueva.", log)
+    if code == "100" and log and _log_mentions_lock(log):
+        return ("No se pudo instalar la actualización porque Ubuntu estaba instalando otras actualizaciones. "
+                "Espera a que termine e inténtalo de nuevo desde el aviso de versión nueva.", log)
     return ("No se pudo instalar la actualización. Revisa tu conexión a internet e inténtalo de nuevo. "
             "Los detalles están en el registro de la instalación.", log)
+
+
+def _log_mentions_lock(log):
+    try:
+        with open(log, encoding="utf-8", errors="replace") as f:
+            text = f.read()
+    except OSError:
+        return False
+    return bool(re.search(r"lock|bloque", text, re.I))
