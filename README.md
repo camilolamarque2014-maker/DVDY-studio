@@ -50,7 +50,27 @@ pip install -r requirements.txt pyinstaller
 python build.py
 ```
 
-Todo lo que genera PyInstaller queda en la carpeta `compilacion/`. El programa está en `compilacion/dist/DVDY Studio/DVDY Studio.exe`, junto con `compilacion/dist/DVDY_Studio-windows-x64.zip`, que es el archivo para subir a GitHub Releases.
+Todo lo que genera PyInstaller queda en la carpeta `compilacion/`. El programa está en `compilacion/dist/DVDY Studio/DVDY Studio.exe`, junto con `compilacion/dist/DVDY_Studio-vX.Y.Z-windows-x64.zip`, que es el archivo para subir a GitHub Releases. La carpeta `compilacion/` no se guarda en git.
+
+## Publicar una versión
+
+1. Cambia `APP_VERSION` en `dvdy/config.py` y escribe las notas en `.github/release-notes.md`.
+2. Haz commit, crea la etiqueta y súbela:
+
+```
+git tag v2.3.2
+git push origin main v2.3.2
+```
+
+GitHub Actions (`.github/workflows/release.yml`) corre las pruebas, compila el .exe en Windows, lo prueba con `--selftest` y publica el release con el zip.
+
+## Pruebas
+
+```
+python -m unittest discover -s tests -t . -v
+```
+
+Las pruebas que necesitan yt-dlp se saltan si no está instalado.
 
 ## Créditos
 

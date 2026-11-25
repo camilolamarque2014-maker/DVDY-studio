@@ -240,11 +240,14 @@ def build_opts(c):
         filters.append(f"duration >= {int(parse_time(c['min_duration']) or 0)}")
     if c.get("max_duration"):
         filters.append(f"duration <= {int(parse_time(c['max_duration']) or 0)}")
-    if c.get("title_filter"):
-        filters.append(f"title ~= '(?i){c['title_filter']}'")
+    base_filter = None
     if filters:
         from yt_dlp.utils import match_filter_func
-        o["match_filter"] = match_filter_func(" & ".join(filters))
+        base_filter = match_filter_func(" & ".join(filters))
+    if c.get("title_filter"):
+        o["match_filter"] = title_filter(c["title_filter"], base_filter)
+    elif base_filter:
+        o["match_filter"] = base_filter
     if c.get("date_after"):
         from yt_dlp.utils import DateRange
         o["daterange"] = DateRange(c["date_after"].replace("-", ""), None)
@@ -253,6 +256,29 @@ def build_opts(c):
         o["skip_download"] = True
     o["postprocessors"] = pps
     return o
+
+
+def title_filter(text, base=None):
+    """Filtro de yt-dlp: solo títulos que contengan `text` (sin distinguir mayúsculas).
+
+    Se compara como texto literal, no como expresión de yt-dlp: así apóstrofos, «&» o
+    paréntesis en lo que escribe el usuario no rompen el filtro. `base` es otro filtro
+    (duración) que también tiene que cumplirse.
+    """
+    needle = text.casefold()
+
+    def _match(info_dict, *, incomplete=False):
+        title = info_dict.get("title")
+        if title is None:
+            if not incomplete:
+                return "Sin título para comparar con el filtro"
+        elif needle not in str(title).casefold():
+            return f"«{title}» no contiene «{text}»"
+        if base is not None:
+            return base(info_dict, incomplete=incomplete)
+        return None
+
+    return _match
 
 
 def default_choices(audio=False):

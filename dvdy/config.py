@@ -5,7 +5,7 @@ import threading
 import time
 
 APP_NAME = "DVDY Studio"
-APP_VERSION = "2.3.1"
+APP_VERSION = "2.3.2"
 
 CONFIG_DIR = os.path.join(os.environ.get("APPDATA") or os.path.expanduser("~"), "DVDY Studio")
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")
@@ -126,9 +126,13 @@ class History:
             self._save()
 
     def _save(self):
+        # Se escribe en un archivo temporal y luego se reemplaza: si la app se cierra a mitad
+        # de la escritura, el historial anterior queda intacto.
         os.makedirs(CONFIG_DIR, exist_ok=True)
-        with open(HISTORY_FILE, "w", encoding="utf-8") as f:
+        tmp = HISTORY_FILE + ".tmp"
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(self.items, f, indent=1, ensure_ascii=False)
+        os.replace(tmp, HISTORY_FILE)
 
 
 cfg = Config()

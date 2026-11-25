@@ -1,0 +1,79 @@
+# Publica una versión nueva de DVDY Studio.
+#
+# Se activa al subir una etiqueta vX.Y.Z (por ejemplo: git push origin v2.3.2).
+# Corre las pruebas, compila el .exe en Windows, lo prueba con --selftest y crea el release
+# en GitHub con el zip. Las notas salen de .github/release-notes.md: la primera línea
+# («# Título») es el título del release y el resto es el texto.
+name: Release
+
+on:
+  push:
+    tags: ["v*.*.*"]
+  workflow_dispatch:  # compilar a mano (sin publicar) desde la pestaña Actions
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: windows-latest
+    timeout-minutes: 40
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.15"
+          allow-prereleases: true
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements.txt pyinstaller pillow
+
+      - name: Verificar que la etiqueta coincide con APP_VERSION
+        if: startsWith(github.ref, 'refs/tags/')
+        run: |
+          $v = python -c "from dvdy.config import APP_VERSION; print(APP_VERSION)"
+          if ("v$v" -ne "${{ github.ref_name }}") {
+            throw "La etiqueta ${{ github.ref_name }} no coincide con APP_VERSION ($v) en dvdy/config.py"
+          }
+
+      - name: Pruebas
+        run: python -m unittest discover -s tests -t . -v
+
+      - name: Compilar
+        run: python build.py
+
+      - name: Probar el .exe (--selftest)
+        timeout-minutes: 10
+        run: |
+          $exe = Get-ChildItem "compilacion/dist/DVDY Studio/DVDY Studio.exe"
+          $out = Join-Path $PWD "selftest"
+          Start-Process -FilePath $exe.FullName -ArgumentList "--selftest", "`"$out`"" -Wait
+          $report = Get-Content (Join-Path $out "selftest.txt") -Encoding utf8
+          $report | Write-Output
+          # Las descargas de YouTube pueden fallar desde los servidores de GitHub (verificación
+          # anti-robots), así que solo se exige que el programa arranque con todo incluido.
+          if (-not ($report | Select-String -SimpleMatch "frozen: True")) { throw "El .exe no arrancó bien" }
+          if (-not ($report | Select-String -SimpleMatch "https solo con certifi: OK")) { throw "Falla HTTPS con certifi" }
+
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: dvdy-studio-${{ github.ref_name }}
+          path: |
+            compilacion/dist/*.zip
+            selftest/
+          if-no-files-found: ignore
+
+      - name: Publicar el release
+        if: startsWith(github.ref, 'refs/tags/')
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          $lines = Get-Content .github/release-notes.md -Encoding utf8
+          $title = $lines[0] -replace '^#\s*', ''
+          $lines[1..($lines.Length - 1)] | Set-Content notes.md -Encoding utf8
+          $zip = (Get-ChildItem compilacion/dist/*.zip).FullName
+          gh release create "${{ github.ref_name }}" "$zip" --title "$title" --notes-file notes.md --verify-tag

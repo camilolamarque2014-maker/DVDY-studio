@@ -6,7 +6,7 @@ Uso:
 
 Resultado:
     compilacion/dist/DVDY Studio/DVDY Studio.exe   (carpeta del programa)
-    compilacion/dist/DVDY_Studio-windows-x64.zip   (para compartir o subir a GitHub Releases)
+    compilacion/dist/DVDY_Studio-vX.Y.Z-windows-x64.zip   (para compartir o subir a GitHub Releases)
     compilacion/build/                             (archivos temporales de PyInstaller)
 """
 import os
@@ -76,7 +76,8 @@ def main():
 
     out_dir = os.path.join(OUT, "dist", APP)
     shutil.copy(os.path.join(ROOT, "README.md"), os.path.join(out_dir, "LEEME.md"))
-    zip_base = os.path.join(OUT, "dist", "DVDY_Studio-windows-x64")
+    from dvdy.config import APP_VERSION
+    zip_base = os.path.join(OUT, "dist", f"DVDY_Studio-v{APP_VERSION}-windows-x64")
     shutil.make_archive(zip_base, "zip", os.path.join(OUT, "dist"), APP)
     size = os.path.getsize(zip_base + ".zip") / 1e6
     print(f"\nListo:\n  {out_dir}\\{APP}.exe\n  {zip_base}.zip  ({size:.0f} MB)")

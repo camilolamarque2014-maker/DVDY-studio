@@ -46,19 +46,19 @@ Sections (sidebar): Descargar, Playlists y música, Buscar, Cola, Convertir, Her
 - Convert: batch FFmpeg conversion with quick presets; Tools: 22 FFmpeg utilities.
 - UI language is Spanish only. No i18n layer exists.
 - Depends on third-party behaviour that changes often (YouTube); errors must be explainable and recoverable (update yt-dlp, retry, view log).
-- Built with PyInstaller (`build.py`, output in `compilacion/`).
+- Built with PyInstaller (`build.py`, output in `compilacion/`, not tracked in git). Releases are built by GitHub Actions when a `vX.Y.Z` tag is pushed.
 - **Open decision:** project license is not chosen yet (GPL-3.0 vs MIT was discussed; MIT would require dropping the bundled mutagen).
 
 ## Brand Commitments
 
-- Name: **DVDY Studio**. Current version 2.0.1 (the original single-file script was v1).
+- Name: **DVDY Studio**. Current version 2.3.2 (the original single-file script was v1).
 - Voice: Spanish addressed with **"tú"** (neutral Spanish: "Pega", "Elige", "Descarga"), plain and friendly, no jargon in the primary flow. Technical terms (codecs, CRF, LUFS) appear only in Advanced surfaces and always with a plain explanation.
 - GitHub description: "Interfaz gráfica para yt-dlp y FFmpeg: descarga videos, música y playlists de YouTube y +1800 sitios en la calidad que elijas, con metadatos y carátulas. Convierte y edita audio y video (MP4→MP3, recortar, comprimir, GIF). Modo simple/avanzado, cola de descargas e instalación automática de FFmpeg. Ejecutable para Windows, sin Python."
 
 ## Evidence on Hand
 
 - Repository: https://github.com/camilolamarque2014-maker/DVDY-studio
-- Releases: v2.0.0 and v2.0.1 (latest) on GitHub Releases.
+- Releases: v2.0.0 through v2.3.2 (latest) on GitHub Releases, built on Windows by GitHub Actions (`.github/workflows/release.yml`).
 - `README.md` documents installation, features, building, and credits (yt-dlp, FFmpeg, Deno, Qt/PySide6).
 - No user counts, testimonials, reviews, press, or download statistics exist. Do not fabricate any.
 
