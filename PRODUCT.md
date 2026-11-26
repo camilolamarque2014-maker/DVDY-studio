@@ -54,7 +54,7 @@ Sections (sidebar): Descargar, Playlists y música, Buscar, Cola, Convertir, Her
 
 - Name: **DVDY Studio**. Current version 2.4.0 (the original single-file script was v1).
 - Voice: Spanish addressed with **"tú"** (neutral Spanish: "Pega", "Elige", "Descarga"), plain and friendly, no jargon in the primary flow. Technical terms (codecs, CRF, LUFS) appear only in Advanced surfaces and always with a plain explanation.
-- GitHub description: "Interfaz gráfica para yt-dlp y FFmpeg: descarga videos, música y playlists de YouTube y +1800 sitios en la calidad que elijas, con metadatos y carátulas. Convierte y edita audio y video (MP4→MP3, recortar, comprimir, GIF). Modo simple/avanzado, cola de descargas e instalación automática de FFmpeg. Ejecutable para Windows, sin Python."
+- GitHub description: "Interfaz gráfica para yt-dlp y FFmpeg: descarga videos, música y playlists de YouTube y +1800 sitios en la calidad que elijas, con metadatos y carátulas. Convierte y edita audio y video (MP4→MP3, recortar, comprimir, GIF). Modo simple/avanzado, cola de descargas e instalación automática de FFmpeg. Para Windows (.exe) y Ubuntu (.deb), sin Python."
 
 ## Evidence on Hand
 
