@@ -142,7 +142,6 @@ class OptionsPanel(QWidget):
         self.parse_artist_title.setChecked(playlist)
         self.album_from_playlist = QCheckBox("Usar el nombre de la playlist como álbum y su orden como nº de pista")
         self.album_from_playlist.setChecked(playlist)
-        self.album_from_playlist.setVisible(playlist)
         self.write_description = QCheckBox("Guardar la descripción en un archivo de texto")
         self.write_info_json = QCheckBox("Guardar toda la información técnica (.info.json)")
         self.write_comments = QCheckBox("Guardar los comentarios (puede tardar)")
@@ -151,6 +150,10 @@ class OptionsPanel(QWidget):
                    self.write_info_json, self.write_comments):
             lay.addWidget(cb)
             cb.toggled.connect(self._update_enabled)
+        # Ocultarla recién ahora que tiene contenedor: un control sin padre que se muestra se vuelve
+        # una ventana propia por un instante (en Ubuntu, GNOME le daba a esa ventana el aviso de
+        # inicio y dejaba el cursor «cargando» hasta agotar la espera).
+        self.album_from_playlist.setVisible(playlist)
         lay.addStretch(1)
         self.tabs.addTab(w, "Datos y carátula")
 
