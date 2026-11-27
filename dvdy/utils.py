@@ -21,6 +21,9 @@ MEDIA_FILTER = ("Multimedia (*.mp4 *.mkv *.webm *.mov *.avi *.flv *.wmv *.m4v *.
 VIDEO_FILTER = "Video (*.mp4 *.mkv *.webm *.mov *.avi *.flv *.wmv *.m4v *.ts *.mpg *.mpeg *.3gp);;Todos (*)"
 AUDIO_FILTER = "Audio (*.mp3 *.m4a *.aac *.flac *.wav *.ogg *.opus *.wma *.aiff *.mka);;Todos (*)"
 IMAGE_FILTER = "Imágenes (*.jpg *.jpeg *.png *.webp *.bmp);;Todos (*)"
+VIDEO_IMAGE_FILTER = ("Video o imagen (*.mp4 *.mkv *.webm *.mov *.avi *.flv *.wmv *.m4v *.ts *.mpg *.mpeg *.3gp "
+                      "*.jpg *.jpeg *.png *.webp *.bmp);;Video (*.mp4 *.mkv *.webm *.mov *.avi *.flv *.wmv *.m4v "
+                      "*.ts *.mpg *.mpeg *.3gp);;Imágenes (*.jpg *.jpeg *.png *.webp *.bmp);;Todos (*)")
 SUB_FILTER = "Subtítulos (*.srt *.ass *.ssa *.vtt);;Todos (*)"
 
 
@@ -30,6 +33,24 @@ def ext_of(path):
 
 def is_audio_file(path):
     return ext_of(path) in AUDIO_EXTS
+
+
+def is_image_file(path):
+    """Imagen fija (el GIF cuenta como video porque puede ser animado)."""
+    ext = ext_of(path)
+    return ext in IMAGE_EXTS and ext != "gif"
+
+
+# Codificador de FFmpeg para guardar una imagen fija según su extensión
+_IMAGE_ENCODERS = {
+    "jpg": ["-c:v", "mjpeg", "-q:v", "2"], "jpeg": ["-c:v", "mjpeg", "-q:v", "2"],
+    "png": ["-c:v", "png"], "webp": ["-c:v", "libwebp", "-quality", "92"], "bmp": ["-c:v", "bmp"],
+}
+
+
+def image_output_args(out):
+    """Argumentos para que FFmpeg escriba UNA imagen (y no un video) en `out`."""
+    return ["-frames:v", "1", "-update", "1", *_IMAGE_ENCODERS.get(ext_of(out), [])]
 
 
 def find_ffmpeg():

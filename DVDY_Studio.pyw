@@ -151,6 +151,8 @@ def _selftest(out_dir):
         from dvdy.ytopts import build_opts, default_choices
         log("frozen:", FROZEN, "yt-dlp:", yt_dlp.version.__version__, "ffmpeg:", find_ffmpeg(),
             "js:", find_js_runtime(), "faltan:", deps.missing_components())
+        from dvdy.theme import resolve_theme
+        log("tema «Como el sistema»:", resolve_theme("auto"))
         dlg = SetupDialog(None, components=("ffmpeg", "deno", "yt-dlp"), preselect=("ffmpeg", "deno"))
         dlg.show()
         dlg.grab().save(os.path.join(out_dir, "setup_dialog.png"))

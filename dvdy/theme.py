@@ -110,6 +110,11 @@ def resolve_theme(choice):
     """'auto' sigue al sistema (Windows o el modo claro/oscuro de Ubuntu); 'dark' y 'light' fuerzan uno."""
     if choice in ("dark", "light"):
         return choice
+    from .system import IS_WINDOWS, linux_color_scheme
+    if not IS_WINDOWS:
+        scheme = linux_color_scheme()
+        if scheme:
+            return scheme
     try:
         scheme = QGuiApplication.styleHints().colorScheme()
         if scheme == Qt.ColorScheme.Light:

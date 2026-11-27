@@ -12,8 +12,8 @@ from PySide6.QtWidgets import (
 
 from .tasks import FFmpegTask
 from .utils import (
-    AUDIO_FILTER, IMAGE_FILTER, MEDIA_FILTER, SUB_FILTER, VIDEO_FILTER, derive_output, ext_of, ffprobe_json,
-    is_audio_file, media_duration, parse_time, ts, unique_path,
+    AUDIO_FILTER, IMAGE_FILTER, MEDIA_FILTER, SUB_FILTER, VIDEO_FILTER, VIDEO_IMAGE_FILTER, derive_output, ext_of,
+    ffprobe_json, image_output_args, is_audio_file, is_image_file, media_duration, parse_time, ts, unique_path,
 )
 from .widgets import FileList, PathPicker, button, card, combo, field, label, row
 
@@ -252,6 +252,9 @@ def b_rotate(v, out):
     src = need_file(v)
     vf = {"90": "transpose=1", "270": "transpose=2", "180": "transpose=1,transpose=1",
           "hflip": "hflip", "vflip": "vflip"}[v["op"]]
+    if is_image_file(src):
+        # Una foto se guarda como foto: con libx264 salía video H.264 con extensión .jpg
+        return {"commands": [["-i", src, "-vf", vf, *image_output_args(out), out]]}
     a = ["-i", src, "-vf", vf, "-c:v", "libx264", "-crf", "18", "-preset", "fast", "-c:a", "copy", out]
     return {"commands": [a], "probe": src}
 
@@ -268,6 +271,8 @@ def b_crop_scale(v, out):
         flt.append(f"scale=-2:{v['height']}")
     if not flt:
         raise ValueError("Elige una relación de aspecto o una altura.")
+    if is_image_file(src):
+        return {"commands": [["-i", src, "-vf", ",".join(flt), *image_output_args(out), out]]}
     a = ["-i", src, "-vf", ",".join(flt), "-c:v", "libx264", "-crf", "20", "-preset", "medium", "-c:a", "copy", out]
     return {"commands": [a], "probe": src}
 
@@ -388,6 +393,10 @@ def b_watermark(v, out):
     except Exception:
         pass
     lh = max(2, int(vh * scale) // 2 * 2)
+    if is_image_file(src):
+        fc = (f"[1:v]scale=-1:{lh},format=rgba,colorchannelmixer=aa={op:.2f}[wm];"
+              f"[0:v][wm]overlay={pos}:format=auto")
+        return {"commands": [["-i", src, "-i", logo, "-filter_complex", fc, *image_output_args(out), out]]}
     fc = (f"[1:v]scale=-1:{lh},format=rgba,colorchannelmixer=aa={op:.2f}[wm];"
           f"[0:v][wm]overlay={pos}:format=auto,format=yuv420p")
     a = ["-i", src, "-i", logo, "-filter_complex", fc, "-c:v", "libx264", "-crf", "19", "-preset", "medium",
@@ -520,15 +529,15 @@ TOOLS = [
                                             suffix=" ×"),
           F("no_audio", "bool", "Quitar el audio (para videos sin sonido)", False)],
          b_speed, "_velocidad"),
-    Tool("Rotar o voltear", "", "Gira el video 90°/180°/270° o lo voltea como un espejo.",
-         [F("input", "file", "Video", filt=VIDEO_FILTER),
+    Tool("Rotar o voltear", "", "Gira un video o una imagen 90°/180°/270° o lo voltea como un espejo.",
+         [F("input", "file", "Video o imagen", filt=VIDEO_IMAGE_FILTER),
           F("op", "choice", "Operación", "90", [("Girar 90° a la derecha", "90"), ("Girar 90° a la izquierda", "270"),
                                                 ("Girar 180°", "180"), ("Voltear horizontal (espejo)", "hflip"),
                                                 ("Voltear vertical", "vflip")])],
          b_rotate, "_rotado"),
     Tool("Recortar encuadre / redimensionar", "", "Cambia la relación de aspecto (p. ej. horizontal → vertical 9:16 "
-                                                        "para Reels/TikTok) o la resolución.",
-         [F("input", "file", "Video", filt=VIDEO_FILTER),
+                                                        "para Reels/TikTok) o la resolución. También sirve con imágenes.",
+         [F("input", "file", "Video o imagen", filt=VIDEO_IMAGE_FILTER),
           F("crop", "choice", "Recortar a", "", [("No recortar", ""), ("16:9 (horizontal)", "16:9"), ("9:16 (vertical)", "9:16"),
                                                 ("1:1 (cuadrado)", "1:1"), ("4:3", "4:3")]),
           F("height", "choice", "Altura final", "", [("Sin cambiar", ""), ("2160", "2160"), ("1920", "1920"), ("1080", "1080"),
@@ -559,8 +568,8 @@ TOOLS = [
          [F("image", "file", "Imagen", filt=IMAGE_FILTER), F("audio", "file", "Audio", filt=AUDIO_FILTER),
           F("height", "choice", "Resolución", "1080", [("1080p", "1080"), ("720p", "720"), ("2160p", "2160")])],
          b_still, "_video", "mp4", input_key="audio"),
-    Tool("Marca de agua", "", "Superpone un logo o imagen sobre el video.",
-         [F("input", "file", "Video", filt=VIDEO_FILTER), F("logo", "file", "Logo (PNG con transparencia)", filt=IMAGE_FILTER),
+    Tool("Marca de agua", "", "Superpone un logo sobre un video o una imagen.",
+         [F("input", "file", "Video o imagen", filt=VIDEO_IMAGE_FILTER), F("logo", "file", "Logo (PNG con transparencia)", filt=IMAGE_FILTER),
           F("pos", "choice", "Posición", "br", [("Abajo a la derecha", "br"), ("Abajo a la izquierda", "bl"),
                                                 ("Arriba a la derecha", "tr"), ("Arriba a la izquierda", "tl"), ("Centro", "c")]),
           F("scale", "int", "Tamaño (alto respecto al video)", 12, minimum=1, maximum=100, suffix=" %"),

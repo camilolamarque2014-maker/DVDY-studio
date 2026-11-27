@@ -1,8 +1,12 @@
 """Ventana principal: barra superior con la marca, el menú y el interruptor Simple / Avanzado."""
 import re
 
-from PySide6.QtCore import QByteArray, Qt, QTimer
+from PySide6.QtCore import QByteArray, QObject, Qt, QTimer, Slot
 from PySide6.QtGui import QGuiApplication
+try:
+    from PySide6.QtDBus import QDBusMessage
+except ImportError:  # Windows: sin D-Bus
+    QDBusMessage = object
 from PySide6.QtWidgets import (
     QApplication, QButtonGroup, QFrame, QHBoxLayout, QLabel, QMainWindow, QPushButton, QStackedWidget,
     QSystemTrayIcon, QVBoxLayout, QWidget,
@@ -135,6 +139,7 @@ class MainWindow(QMainWindow):
             QGuiApplication.styleHints().colorSchemeChanged.connect(lambda *_: self.apply_theme())
         except Exception:
             pass
+        self._watch_desktop_appearance()
 
         self.tray = QSystemTrayIcon(app_icon(), self)
         self.tray.setToolTip(APP_NAME)
@@ -353,6 +358,25 @@ class MainWindow(QMainWindow):
             cfg["ui_mode"] = "advanced" if advanced else "simple"
             cfg.save()
 
+    def _watch_desktop_appearance(self):
+        """Linux: escuchar el aviso del portal cuando cambia el modo claro/oscuro del escritorio.
+
+        En el programa compilado, Qt cree que el tema siempre es claro, así que su propia señal
+        no avisa del paso de oscuro a claro. El portal sí avisa siempre.
+        """
+        from .system import IS_WINDOWS
+        if IS_WINDOWS:
+            return
+        try:
+            from PySide6.QtCore import SLOT
+            from PySide6.QtDBus import QDBusConnection
+        except ImportError:
+            return
+        self._appearance_watcher = _AppearanceWatcher(self)
+        QDBusConnection.sessionBus().connect(
+            "", "/org/freedesktop/portal/desktop", "org.freedesktop.portal.Settings", "SettingChanged",
+            self._appearance_watcher, SLOT("changed(QDBusMessage)"))
+
     def apply_theme(self):
         app = QApplication.instance()
         from .theme import apply_palette
@@ -395,3 +419,17 @@ class MainWindow(QMainWindow):
             self.manager.cancel_all()
         self.tray.hide()
         e.accept()
+
+
+class _AppearanceWatcher(QObject):
+    """Recibe SettingChanged del portal y vuelve a aplicar el tema si cambió el modo claro/oscuro."""
+
+    def __init__(self, window):
+        super().__init__(window)
+        self._window = window
+
+    @Slot(QDBusMessage)
+    def changed(self, msg):
+        args = msg.arguments()
+        if len(args) >= 2 and args[0] == "org.freedesktop.appearance" and args[1] == "color-scheme":
+            QTimer.singleShot(0, self._window.apply_theme)

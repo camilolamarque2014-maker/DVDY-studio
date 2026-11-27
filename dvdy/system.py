@@ -178,3 +178,52 @@ def gnome_animations_enabled():
         return r.stdout.strip() != "false"
     except (OSError, subprocess.SubprocessError):
         return True
+
+
+def _run_text(cmd, timeout=2):
+    try:
+        r = subprocess.run(cmd, stdin=subprocess.DEVNULL, capture_output=True, text=True, timeout=timeout)
+        return r.stdout.strip() if r.returncode == 0 else ""
+    except (OSError, subprocess.SubprocessError):
+        return ""
+
+
+def parse_portal_color_scheme(text):
+    """Respuesta de gdbus del portal: '(<uint32 1>,)' o '(<<uint32 1>>,)' -> 1 oscuro, 2 claro, 0 sin preferencia."""
+    import re
+    m = re.search(r"uint32\s+(\d+)", text or "")
+    return int(m.group(1)) if m else None
+
+
+def linux_color_scheme():
+    """'dark', 'light' o None según la apariencia del escritorio (GNOME, KDE…).
+
+    Se pregunta al portal de escritorio (org.freedesktop.appearance), que es lo que usan las
+    apps de GNOME. En el programa compilado no alcanza con Qt: su copia de GTK no puede leer
+    la configuración de GNOME y siempre informa el tema claro.
+    """
+    if not IS_LINUX:
+        return None
+    if shutil.which("gdbus"):
+        for method in ("ReadOne", "Read"):
+            value = parse_portal_color_scheme(_run_text(
+                ["gdbus", "call", "--session", "--timeout", "2", "--dest", "org.freedesktop.portal.Desktop",
+                 "--object-path", "/org/freedesktop/portal/desktop",
+                 "--method", f"org.freedesktop.portal.Settings.{method}",
+                 "org.freedesktop.appearance", "color-scheme"]))
+            if value == 1:
+                return "dark"
+            if value == 2:
+                return "light"
+            if value == 0:
+                break  # sin preferencia: mirar el tema de GNOME
+    if shutil.which("gsettings"):
+        scheme = _run_text(["gsettings", "get", "org.gnome.desktop.interface", "color-scheme"]).strip("'")
+        if scheme == "prefer-dark":
+            return "dark"
+        if scheme == "prefer-light":
+            return "light"
+        gtk = _run_text(["gsettings", "get", "org.gnome.desktop.interface", "gtk-theme"]).strip("'")
+        if gtk:
+            return "dark" if gtk.lower().endswith("-dark") or ":dark" in gtk.lower() else "light"
+    return None

@@ -7,7 +7,7 @@ import time
 from .system import config_dir, user_dir
 
 APP_NAME = "DVDY Studio"
-APP_VERSION = "2.4.1"
+APP_VERSION = "2.4.2"
 
 CONFIG_DIR = config_dir()  # Windows: %APPDATA%\DVDY Studio · Linux: ~/.config/dvdy-studio
 CONFIG_FILE = os.path.join(CONFIG_DIR, "config.json")

@@ -111,3 +111,55 @@ class ExtractTest(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class ColorSchemeTest(unittest.TestCase):
+    """Modo claro/oscuro de Ubuntu leído del portal (o de gsettings si el portal no responde)."""
+
+    def setUp(self):
+        self.saved = (system._run_text, system.shutil.which, system.IS_LINUX)
+        system.IS_LINUX = True
+        system.shutil.which = lambda name: "/usr/bin/" + name
+
+    def tearDown(self):
+        system._run_text, system.shutil.which, system.IS_LINUX = self.saved
+
+    def fake(self, answers):
+        def run(cmd, timeout=2):
+            key = " ".join(cmd)
+            for pattern, value in answers.items():
+                if pattern in key:
+                    return value
+            return ""
+        system._run_text = run
+
+    def test_respuestas_del_portal(self):
+        p = system.parse_portal_color_scheme
+        self.assertEqual(p("(<uint32 1>,)"), 1)
+        self.assertEqual(p("(<<uint32 2>>,)"), 2)
+        self.assertIsNone(p(""))
+
+    def test_portal_oscuro_y_claro(self):
+        self.fake({"ReadOne": "(<uint32 1>,)"})
+        self.assertEqual(system.linux_color_scheme(), "dark")
+        self.fake({"ReadOne": "(<uint32 2>,)"})
+        self.assertEqual(system.linux_color_scheme(), "light")
+
+    def test_portal_viejo_solo_tiene_read(self):
+        self.fake({"Settings.Read ": "(<<uint32 1>>,)"})
+        self.assertEqual(system.linux_color_scheme(), "dark")
+
+    def test_sin_portal_usa_gsettings(self):
+        self.fake({"color-scheme": "'prefer-dark'"})
+        system.shutil.which = lambda name: None if name == "gdbus" else "/usr/bin/" + name
+        self.assertEqual(system.linux_color_scheme(), "dark")
+
+    def test_sin_preferencia_mira_el_tema_gtk(self):
+        self.fake({"ReadOne": "(<uint32 0>,)", "color-scheme": "'default'", "gtk-theme": "'Yaru-dark'"})
+        self.assertEqual(system.linux_color_scheme(), "dark")
+        self.fake({"ReadOne": "(<uint32 0>,)", "color-scheme": "'default'", "gtk-theme": "'Yaru'"})
+        self.assertEqual(system.linux_color_scheme(), "light")
+
+    def test_nada_responde(self):
+        self.fake({})
+        self.assertIsNone(system.linux_color_scheme())
